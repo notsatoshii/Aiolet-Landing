@@ -616,18 +616,62 @@ const TeamAgentView = () => {
           ))}
         </div>
 
-        {/* Data flow indicator between departments */}
-        <div className="w-full max-w-2xl mt-3 px-2">
-          <div className="flex items-center justify-center gap-2">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-green-400/40 to-green-400/60" />
+        {/* Inter-department communication lines with animated particles */}
+        <div className="w-full max-w-2xl mt-4 px-2 relative">
+          {/* Horizontal connection line */}
+          <div className="absolute left-[20%] right-[20%] top-1/2 h-px bg-gradient-to-r from-green-400/30 via-green-400/50 to-green-400/30" />
+          
+          {/* Animated particles flowing left to right */}
+          {[...Array(4)].map((_, i) => (
+            <motion.div
+              key={`particle-lr-${i}`}
+              className="absolute w-2 h-2 rounded-full bg-green-400 top-1/2 -translate-y-1/2"
+              style={{ boxShadow: '0 0 8px hsl(160 70% 50%), 0 0 16px hsl(160 70% 50% / 0.5)' }}
+              initial={{ left: '20%', opacity: 0 }}
+              animate={{ 
+                left: ['20%', '80%'],
+                opacity: [0, 1, 1, 0]
+              }}
+              transition={{
+                duration: 2.5,
+                delay: i * 0.6,
+                repeat: Infinity,
+                repeatDelay: 0.4,
+                ease: "linear"
+              }}
+            />
+          ))}
+          
+          {/* Animated particles flowing right to left */}
+          {[...Array(3)].map((_, i) => (
+            <motion.div
+              key={`particle-rl-${i}`}
+              className="absolute w-1.5 h-1.5 rounded-full bg-cyan-400 top-1/2 -translate-y-1/2"
+              style={{ boxShadow: '0 0 6px hsl(185 80% 55%), 0 0 12px hsl(185 80% 55% / 0.5)' }}
+              initial={{ left: '80%', opacity: 0 }}
+              animate={{ 
+                left: ['80%', '20%'],
+                opacity: [0, 1, 1, 0]
+              }}
+              transition={{
+                duration: 2,
+                delay: 0.3 + i * 0.7,
+                repeat: Infinity,
+                repeatDelay: 0.8,
+                ease: "linear"
+              }}
+            />
+          ))}
+          
+          {/* Label */}
+          <div className="flex items-center justify-center gap-2 h-6">
             <motion.div 
-              className="text-[8px] font-mono text-green-400/70 uppercase tracking-widest px-2"
-              animate={{ opacity: [0.5, 1, 0.5] }}
+              className="text-[8px] font-mono text-green-400/70 uppercase tracking-widest px-3 py-1 bg-card/80 border border-green-400/20 relative z-10"
+              animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              Data Flow
+              Cross-Team Data Flow
             </motion.div>
-            <div className="flex-1 h-px bg-gradient-to-r from-green-400/60 via-green-400/40 to-transparent" />
           </div>
         </div>
       </div>
