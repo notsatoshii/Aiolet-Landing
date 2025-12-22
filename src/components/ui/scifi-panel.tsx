@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import { GlowingEffect } from "./glowing-effect";
 
 interface SciFiPanelProps {
   children: ReactNode;
@@ -20,6 +21,15 @@ export const SciFiPanel = ({ children, className, glowing = false, label }: SciF
       <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-primary/60" />
       <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-primary/60" />
       <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-primary/60" />
+      
+      {/* Glowing Effect */}
+      <GlowingEffect 
+        spread={40} 
+        glow={glowing}
+        proximity={64}
+        inactiveZone={0.5}
+        borderWidth={2}
+      />
       
       {/* Main border */}
       <div className={cn(
@@ -64,9 +74,16 @@ export const SciFiCard = ({ children, className, hoverable = true }: SciFiCardPr
       "relative group",
       className
     )}>
-      {/* Outer glow on hover */}
+      {/* Glowing Effect on hover */}
       {hoverable && (
-        <div className="absolute -inset-px bg-primary/0 group-hover:bg-primary/10 transition-colors duration-500 blur-sm" />
+        <GlowingEffect 
+          spread={30} 
+          glow
+          blur={4}
+          proximity={48}
+          inactiveZone={0.4}
+          borderWidth={1}
+        />
       )}
       
       {/* Card */}
