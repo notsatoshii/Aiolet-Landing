@@ -237,117 +237,111 @@ const WorkflowVisualization = () => {
     <div className="relative w-full h-[160px]">
       <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
-      {/* Clean hierarchical layout using flexbox */}
-      <div className="relative w-full h-full flex flex-col items-center justify-between py-2">
+      {/* Grid-based layout for perfect alignment */}
+      <div className="relative w-full h-full flex flex-col items-center gap-0 py-1">
         
         {/* Row 1: Orchestrator */}
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full relative z-10">
           <WorkflowNode label="ORCH" role="Orchestrator" tier="leader" icon="◈" />
         </div>
 
-        {/* Vertical lines from Orchestrator to Managers */}
-        <div className="relative w-full h-6 flex justify-center">
-          <svg className="absolute inset-0 w-full h-full overflow-visible">
-            {/* Center vertical line down */}
-            <motion.line 
-              x1="50%" y1="0" x2="50%" y2="50%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            />
-            {/* Horizontal line connecting to managers */}
-            <motion.line 
-              x1="25%" y1="50%" x2="75%" y2="50%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-            />
-            {/* Left vertical to research mgr */}
-            <motion.line 
-              x1="25%" y1="50%" x2="25%" y2="100%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-            />
-            {/* Right vertical to content mgr */}
-            <motion.line 
-              x1="75%" y1="50%" x2="75%" y2="100%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-            />
-          </svg>
+        {/* Connector: Orchestrator to Managers */}
+        <div className="w-full flex justify-center relative h-5">
+          {/* Vertical line from orchestrator */}
+          <motion.div 
+            className="absolute top-0 left-1/2 w-px h-1/2 bg-primary/50"
+            initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
+            style={{ transformOrigin: 'top' }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          />
+          {/* Horizontal bar */}
+          <motion.div 
+            className="absolute top-1/2 left-1/4 w-1/2 h-px bg-primary/50"
+            initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          />
+          {/* Left drop */}
+          <motion.div 
+            className="absolute top-1/2 left-1/4 w-px h-1/2 bg-primary/50"
+            initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
+            style={{ transformOrigin: 'top' }}
+            transition={{ duration: 0.2, delay: 0.4 }}
+          />
+          {/* Right drop */}
+          <motion.div 
+            className="absolute top-1/2 right-1/4 w-px h-1/2 bg-primary/50"
+            initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
+            style={{ transformOrigin: 'top' }}
+            transition={{ duration: 0.2, delay: 0.4 }}
+          />
         </div>
 
         {/* Row 2: Managers */}
-        <div className="flex justify-between w-full px-4 sm:px-8">
-          <div className="flex-1 flex justify-center">
-            <WorkflowNode label="R-MGR" role="Research Lead" tier="manager" />
+        <div className="flex justify-around w-full px-2 relative z-10">
+          <WorkflowNode label="R-MGR" role="Research Lead" tier="manager" />
+          <WorkflowNode label="C-MGR" role="Content Lead" tier="manager" />
+        </div>
+
+        {/* Connector: Managers to Workers */}
+        <div className="w-full flex relative h-5">
+          {/* Left team connectors */}
+          <div className="flex-1 relative">
+            {/* Vertical from R-MGR */}
+            <motion.div 
+              className="absolute top-0 left-1/2 w-px h-1/2 bg-primary/40"
+              initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
+              style={{ transformOrigin: 'top' }}
+              transition={{ duration: 0.2, delay: 0.5 }}
+            />
+            {/* Horizontal bar for left workers */}
+            <motion.div 
+              className="absolute top-1/2 left-[15%] w-[70%] h-px bg-primary/40"
+              initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+              transition={{ duration: 0.3, delay: 0.55 }}
+            />
+            {/* Drops to 3 workers */}
+            <motion.div className="absolute top-1/2 left-[15%] w-px h-1/2 bg-primary/40" />
+            <motion.div className="absolute top-1/2 left-1/2 w-px h-1/2 bg-primary/40" />
+            <motion.div className="absolute top-1/2 left-[85%] w-px h-1/2 bg-primary/40" />
           </div>
-          <div className="flex-1 flex justify-center">
-            <WorkflowNode label="C-MGR" role="Content Lead" tier="manager" />
+          
+          {/* Right team connectors */}
+          <div className="flex-1 relative">
+            {/* Vertical from C-MGR */}
+            <motion.div 
+              className="absolute top-0 left-1/2 w-px h-1/2 bg-primary/40"
+              initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
+              style={{ transformOrigin: 'top' }}
+              transition={{ duration: 0.2, delay: 0.5 }}
+            />
+            {/* Horizontal bar for right workers */}
+            <motion.div 
+              className="absolute top-1/2 left-[15%] w-[70%] h-px bg-primary/40"
+              initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+              transition={{ duration: 0.3, delay: 0.55 }}
+            />
+            {/* Drops to 3 workers */}
+            <motion.div className="absolute top-1/2 left-[15%] w-px h-1/2 bg-primary/40" />
+            <motion.div className="absolute top-1/2 left-1/2 w-px h-1/2 bg-primary/40" />
+            <motion.div className="absolute top-1/2 left-[85%] w-px h-1/2 bg-primary/40" />
           </div>
         </div>
 
-        {/* Vertical lines from Managers to Workers */}
-        <div className="relative w-full h-6 flex justify-center">
-          <svg className="absolute inset-0 w-full h-full overflow-visible">
-            {/* Left side: Research team connections */}
-            <motion.line 
-              x1="25%" y1="0" x2="25%" y2="50%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.3, delay: 0.5 }}
-            />
-            <motion.line 
-              x1="10%" y1="50%" x2="40%" y2="50%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.4, delay: 0.55 }}
-            />
-            <motion.line x1="10%" y1="50%" x2="10%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
-            <motion.line x1="25%" y1="50%" x2="25%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
-            <motion.line x1="40%" y1="50%" x2="40%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
-            
-            {/* Right side: Content team connections */}
-            <motion.line 
-              x1="75%" y1="0" x2="75%" y2="50%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.3, delay: 0.5 }}
-            />
-            <motion.line 
-              x1="60%" y1="50%" x2="90%" y2="50%"
-              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-              transition={{ duration: 0.4, delay: 0.55 }}
-            />
-            <motion.line x1="60%" y1="50%" x2="60%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
-            <motion.line x1="75%" y1="50%" x2="75%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
-            <motion.line x1="90%" y1="50%" x2="90%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
-          </svg>
+        {/* Row 3: Workers - split into two teams */}
+        <div className="flex w-full relative z-10">
+          {/* Left team: Research workers */}
+          <div className="flex-1 flex justify-around px-1">
+            <WorkflowNode label="SCRP" role="Scraper" tier="worker" />
+            <WorkflowNode label="ANLY" role="Analyst" tier="worker" />
+            <WorkflowNode label="FACT" role="Fact Check" tier="worker" />
+          </div>
+          {/* Right team: Content workers */}
+          <div className="flex-1 flex justify-around px-1">
+            <WorkflowNode label="WRIT" role="Writer" tier="worker" />
+            <WorkflowNode label="EDIT" role="Editor" tier="worker" />
+            <WorkflowNode label="PUB" role="Publisher" tier="worker" />
+          </div>
         </div>
-
-        {/* Row 3: Workers */}
-        <div className="flex justify-between w-full gap-1">
-          <WorkflowNode label="SCRP" role="Scraper" tier="worker" />
-          <WorkflowNode label="ANLY" role="Analyst" tier="worker" />
-          <WorkflowNode label="FACT" role="Fact Check" tier="worker" />
-          <WorkflowNode label="WRIT" role="Writer" tier="worker" />
-          <WorkflowNode label="EDIT" role="Editor" tier="worker" />
-          <WorkflowNode label="PUB" role="Publisher" tier="worker" />
-        </div>
-
-        {/* Data flow line between teams (Analyst → Writer) */}
-        <motion.div 
-          className="absolute top-[68%] left-[28%] w-[22%] h-px"
-          style={{ 
-            background: 'linear-gradient(90deg, hsl(160 100% 45% / 0.6), hsl(160 100% 45% / 0.3))',
-          }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ delay: 1, duration: 0.5 }}
-        />
       </div>
     </div>
   );
