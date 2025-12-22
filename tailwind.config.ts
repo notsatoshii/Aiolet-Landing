@@ -19,7 +19,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Orbitron', 'Inter', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
