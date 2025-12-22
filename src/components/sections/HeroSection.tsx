@@ -207,111 +207,141 @@ const HeroSection = () => {
 };
 
 const WorkflowVisualization = () => {
-  const agents = [
-    { id: "research", label: "RSRCH", x: 20, y: 25, delay: 0 },
-    { id: "write", label: "WRITE", x: 100, y: 75, delay: 0.15 },
-    { id: "review", label: "REVW", x: 180, y: 25, delay: 0.3 },
-    { id: "post", label: "POST", x: 260, y: 75, delay: 0.45 },
+  const nodes = [
+    { id: "input", label: "INPUT", x: 10, y: 50, icon: "→" },
+    { id: "research", label: "RSRCH", x: 80, y: 50 },
+    { id: "write", label: "WRITE", x: 150, y: 50 },
+    { id: "review", label: "REVW", x: 220, y: 50 },
+    { id: "post", label: "POST", x: 290, y: 50 },
+  ];
+
+  const connections = [
+    { from: 0, to: 1 },
+    { from: 1, to: 2 },
+    { from: 2, to: 3 },
+    { from: 3, to: 4 },
   ];
 
   return (
     <div className="relative w-full h-[140px]">
       {/* Grid background */}
-      <div className="absolute inset-0 bg-grid-fine opacity-50" />
+      <div className="absolute inset-0 bg-grid-fine opacity-40" />
       
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 320 120">
-        {/* Connection lines with glow */}
-        {[
-          { x1: 50, y1: 42, x2: 100, y2: 72 },
-          { x1: 130, y1: 72, x2: 180, y2: 42 },
-          { x1: 210, y1: 42, x2: 260, y2: 72 },
-        ].map((line, i) => (
-          <g key={i}>
-            <motion.line
-              x1={line.x1}
-              y1={line.y1}
-              x2={line.x2}
-              y2={line.y2}
-              stroke="hsl(var(--primary))"
-              strokeWidth="1"
-              strokeOpacity="0.2"
-              filter="url(#glow)"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 0.2 + i * 0.15, duration: 0.5 }}
-            />
-            <motion.line
-              x1={line.x1}
-              y1={line.y1}
-              x2={line.x2}
-              y2={line.y2}
-              stroke="hsl(var(--primary))"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.6 }}
-              transition={{ delay: 0.2 + i * 0.15, duration: 0.4 }}
-            />
-          </g>
-        ))}
-        
-        {/* Glow filter */}
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 360 140" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <filter id="glow-line" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill="hsl(var(--primary))" fillOpacity="0.6" />
+          </marker>
         </defs>
+
+        {/* Connection lines */}
+        {connections.map((conn, i) => {
+          const from = nodes[conn.from];
+          const to = nodes[conn.to];
+          const fromX = from.x + 28;
+          const toX = to.x + 2;
+          const y = 70;
+          
+          return (
+            <g key={i}>
+              {/* Glow line */}
+              <motion.line
+                x1={fromX}
+                y1={y}
+                x2={toX}
+                y2={y}
+                stroke="hsl(var(--primary))"
+                strokeWidth="1"
+                strokeOpacity="0.3"
+                filter="url(#glow-line)"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
+              />
+              {/* Main line */}
+              <motion.line
+                x1={fromX}
+                y1={y}
+                x2={toX}
+                y2={y}
+                stroke="hsl(var(--primary))"
+                strokeWidth="1.5"
+                markerEnd="url(#arrowhead)"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.7 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.3 }}
+              />
+              {/* Animated dot */}
+              <motion.circle
+                cx={fromX}
+                cy={y}
+                r="2"
+                fill="hsl(var(--primary))"
+                initial={{ cx: fromX }}
+                animate={{ cx: toX }}
+                transition={{ 
+                  delay: 0.8 + i * 0.15, 
+                  duration: 0.6, 
+                  repeat: Infinity, 
+                  repeatDelay: 2,
+                  ease: "easeInOut"
+                }}
+              />
+            </g>
+          );
+        })}
       </svg>
 
-      {agents.map((agent) => (
+      {/* Nodes */}
+      {nodes.map((node, i) => (
         <motion.div
-          key={agent.id}
+          key={node.id}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: agent.delay, duration: 0.3, ease: "easeOut" }}
+          transition={{ delay: i * 0.08, duration: 0.3, ease: "easeOut" }}
           className="absolute"
-          style={{ left: agent.x, top: agent.y }}
+          style={{ left: node.x, top: node.y }}
         >
-          <div className="relative">
+          <div className="relative group">
             {/* Outer glow */}
-            <div className="absolute inset-0 bg-primary/20 blur-md" />
+            <div className="absolute -inset-1 bg-primary/15 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            {/* Node */}
-            <div className="relative w-12 h-12 bg-card border border-primary/40 flex items-center justify-center hover:border-primary hover:bg-primary/10 transition-all cursor-pointer group"
-                 style={{ boxShadow: '0 0 15px hsl(var(--primary) / 0.2)' }}>
+            {/* Node box */}
+            <div 
+              className="relative w-[30px] h-[30px] bg-card border border-primary/50 flex items-center justify-center hover:border-primary hover:bg-primary/10 transition-all cursor-pointer"
+              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.15)' }}
+            >
               {/* Corner accents */}
-              <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-primary" />
-              <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-primary" />
-              <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b border-primary" />
-              <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b border-primary" />
+              <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
+              <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
+              <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
+              <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
               
-              <span className="text-[9px] font-mono text-primary group-hover:text-primary transition-colors tracking-wider">
-                {agent.label}
-              </span>
+              {/* Status indicator */}
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
+                   style={{ boxShadow: '0 0 6px #4ade80' }} />
+              
+              {node.icon ? (
+                <span className="text-xs text-primary">{node.icon}</span>
+              ) : (
+                <div className="w-2.5 h-2.5 bg-primary/40 border border-primary/60" />
+              )}
             </div>
+            
+            {/* Label */}
+            <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/70 uppercase tracking-wider whitespace-nowrap">
+              {node.label}
+            </span>
           </div>
         </motion.div>
       ))}
-
-      {/* Central hub */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.6, duration: 0.3 }}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      >
-        <div className="relative w-8 h-8">
-          <div className="absolute inset-0 bg-primary/30 animate-ping" style={{ animationDuration: '2s' }} />
-          <div className="relative w-full h-full bg-card border border-primary/60 rotate-45 flex items-center justify-center"
-               style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' }}>
-            <div className="w-2 h-2 bg-primary -rotate-45" />
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 };

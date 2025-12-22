@@ -174,50 +174,59 @@ const SingleAgentView = () => {
 };
 
 const TeamAgentView = () => {
-  const agents = [
-    { label: "LEAD", x: "50%", y: "10%" },
-    { label: "RSRCH", x: "20%", y: "42%" },
-    { label: "CREATE", x: "50%", y: "42%" },
-    { label: "REVW", x: "80%", y: "42%" },
-    { label: "EXEC", x: "50%", y: "75%" },
+  // Use pixel positions for precise alignment
+  const nodes = [
+    { label: "LEAD", x: 50, y: 15 },
+    { label: "RSRCH", x: 15, y: 45 },
+    { label: "CREATE", x: 50, y: 45 },
+    { label: "REVW", x: 85, y: 45 },
+    { label: "EXEC", x: 50, y: 78 },
+  ];
+
+  const connections = [
+    // From LEAD to middle row
+    { from: { x: 50, y: 22 }, to: { x: 15, y: 38 } },
+    { from: { x: 50, y: 22 }, to: { x: 50, y: 38 } },
+    { from: { x: 50, y: 22 }, to: { x: 85, y: 38 } },
+    // From middle row to EXEC
+    { from: { x: 15, y: 52 }, to: { x: 50, y: 71 } },
+    { from: { x: 50, y: 52 }, to: { x: 50, y: 71 } },
+    { from: { x: 85, y: 52 }, to: { x: 50, y: 71 } },
   ];
 
   return (
     <div className="relative w-full h-full">
       <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
-      {/* Connections */}
-      <svg className="absolute inset-0 w-full h-full">
+      {/* Connections SVG */}
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <filter id="glow-team" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          <marker id="arrow-team" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
+            <polygon points="0 0, 4 2, 0 4" fill="hsl(var(--primary))" fillOpacity="0.5" />
+          </marker>
         </defs>
-        {[
-          { x1: "50%", y1: "18%", x2: "20%", y2: "35%" },
-          { x1: "50%", y1: "18%", x2: "50%", y2: "35%" },
-          { x1: "50%", y1: "18%", x2: "80%", y2: "35%" },
-          { x1: "20%", y1: "50%", x2: "50%", y2: "68%" },
-          { x1: "50%", y1: "50%", x2: "50%", y2: "68%" },
-          { x1: "80%", y1: "50%", x2: "50%", y2: "68%" },
-        ].map((line, i) => (
+        
+        {connections.map((conn, i) => (
           <motion.line
             key={i}
-            x1={line.x1}
-            y1={line.y1}
-            x2={line.x2}
-            y2={line.y2}
+            x1={`${conn.from.x}%`}
+            y1={`${conn.from.y}%`}
+            x2={`${conn.to.x}%`}
+            y2={`${conn.to.y}%`}
             stroke="hsl(var(--primary))"
-            strokeWidth="1.5"
-            strokeDasharray="6 4"
-            filter="url(#glow2)"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            transition={{ duration: 0.4, delay: 0.2 + i * 0.05 }}
+            strokeWidth="0.8"
+            markerEnd="url(#arrow-team)"
+            filter="url(#glow-team)"
+            initial={{ opacity: 0, pathLength: 0 }}
+            animate={{ opacity: 0.6, pathLength: 1 }}
+            transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
           />
         ))}
       </svg>
@@ -229,42 +238,48 @@ const TeamAgentView = () => {
         transition={{ delay: 0.5 }}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
       >
-        <div className="relative w-14 h-14">
-          <div className="absolute inset-0 bg-primary/20 blur-xl" />
+        <div className="relative w-10 h-10">
+          <div className="absolute inset-0 bg-primary/20 blur-lg" />
           <div className="relative w-full h-full bg-primary/10 border border-primary/40 rotate-45 flex items-center justify-center"
-               style={{ boxShadow: '0 0 25px hsl(var(--primary) / 0.3)' }}>
-            <div className="w-4 h-4 bg-primary/40 -rotate-45 flex items-center justify-center">
-              <div className="w-2 h-2 bg-primary" />
+               style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.25)' }}>
+            <div className="w-3 h-3 bg-primary/50 -rotate-45 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-primary" />
             </div>
           </div>
         </div>
-        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-mono text-primary/60 uppercase tracking-widest whitespace-nowrap">
+        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/50 uppercase tracking-widest whitespace-nowrap">
           Context
         </span>
       </motion.div>
 
       {/* Agent nodes */}
-      {agents.map((agent, i) => (
+      {nodes.map((node, i) => (
         <motion.div
-          key={agent.label}
+          key={node.label}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 + i * 0.08, ease: "easeOut" }}
+          transition={{ delay: 0.08 + i * 0.06, ease: "easeOut" }}
           className="absolute -translate-x-1/2 -translate-y-1/2"
-          style={{ left: agent.x, top: agent.y }}
+          style={{ left: `${node.x}%`, top: `${node.y}%` }}
         >
-          <div className="relative">
-            <div className="absolute inset-0 bg-primary/10 blur-md" />
-            <div className="relative w-14 h-14 bg-card border border-primary/40 flex items-center justify-center hover:border-primary hover:bg-primary/10 transition-all cursor-pointer"
-                 style={{ boxShadow: '0 0 15px hsl(var(--primary) / 0.15)' }}>
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-primary/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div 
+              className="relative w-12 h-12 bg-card border border-primary/40 flex items-center justify-center hover:border-primary hover:bg-primary/10 transition-all cursor-pointer"
+              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.12)' }}
+            >
               {/* Corner accents */}
-              <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-primary/60" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-primary/60" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-primary/60" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-primary/60" />
+              <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
+              <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
+              <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
+              <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
+              
+              {/* Status dot */}
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
+                   style={{ boxShadow: '0 0 6px #4ade80' }} />
               
               <span className="text-[9px] font-mono text-primary uppercase tracking-wider">
-                {agent.label}
+                {node.label}
               </span>
             </div>
           </div>
