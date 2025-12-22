@@ -9,11 +9,13 @@ import WhoItsFor from "@/components/sections/WhoItsFor";
 import FinalCTA from "@/components/sections/FinalCTA";
 import Footer from "@/components/sections/Footer";
 import { InfiniteGridBackground } from "@/components/ui/infinite-grid-background";
+import { PixelCursorTrail } from "@/components/ui/pixel-cursor-trail";
 
 const Index = () => {
   return (
     <main className="relative min-h-screen bg-background overflow-x-hidden">
       <InfiniteGridBackground />
+      <PixelCursorTrail />
       <Header />
       <HeroSection />
       <section id="features">
