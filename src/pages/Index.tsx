@@ -12,9 +12,11 @@ import DotScreenShader from "@/components/ui/dot-screen-shader";
 
 const Index = () => {
   return (
-    <main className="relative min-h-screen bg-background overflow-x-hidden">
-      {/* Interactive dot grid background */}
+    <>
+      {/* Interactive dot grid background - renders behind everything */}
       <DotScreenShader />
+      
+      <main className="relative z-10 min-h-screen overflow-x-hidden">
       
       <Header />
       <HeroSection />
@@ -34,7 +36,8 @@ const Index = () => {
         <FinalCTA />
       </section>
       <Footer />
-    </main>
+      </main>
+    </>
   );
 };
 
