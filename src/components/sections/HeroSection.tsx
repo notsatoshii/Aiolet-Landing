@@ -310,18 +310,12 @@ const WorkflowVisualization = () => {
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="glow-line-hero" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          <marker id="arrow-command" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <polygon points="0 0, 6 3, 0 6" fill="hsl(var(--primary))" fillOpacity="0.8" />
-          </marker>
-          <marker id="arrow-data" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-            <polygon points="0 0, 5 2.5, 0 5" fill="hsl(160 100% 45%)" fillOpacity="0.8" />
-          </marker>
         </defs>
 
         {connections.map((conn, i) => {
@@ -340,7 +334,6 @@ const WorkflowVisualization = () => {
           const opacity = getConnectionOpacity(conn.from, conn.to);
           const isDataFlow = conn.type === "data";
           const strokeColor = isDataFlow ? "hsl(160 100% 45%)" : "hsl(var(--primary))";
-          const markerId = isDataFlow ? "arrow-data" : "arrow-command";
           
           // Create curved paths using percentage coordinates
           const midY = (fromY + toY) / 2;
@@ -353,11 +346,11 @@ const WorkflowVisualization = () => {
               <motion.path
                 d={path}
                 stroke={strokeColor}
-                strokeWidth={1.5}
+                strokeWidth={1}
                 strokeDasharray={isDataFlow ? "3 2" : "none"}
                 fill="none"
                 filter="url(#glow-line-hero)"
-                markerEnd={`url(#${markerId})`}
+                strokeLinecap="round"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: opacity * 0.7 }}
                 transition={{ delay: 0.2 + i * 0.05, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}

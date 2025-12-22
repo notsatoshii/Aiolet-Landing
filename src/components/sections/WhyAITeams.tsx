@@ -332,23 +332,20 @@ const SingleAgentView = () => {
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="grad-in" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(0 70% 50%)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="hsl(0 70% 50%)" stopOpacity="1" />
+            <stop offset="0%" stopColor="hsl(0 70% 50%)" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="hsl(0 70% 50%)" stopOpacity="0.8" />
           </linearGradient>
           <linearGradient id="grad-out-fail" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="hsl(0 70% 50%)" stopOpacity="0.5" />
             <stop offset="100%" stopColor="hsl(0 70% 50%)" stopOpacity="0.1" />
           </linearGradient>
           <linearGradient id="grad-out-success" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(142 76% 56%)" stopOpacity="1" />
-            <stop offset="100%" stopColor="hsl(142 76% 56%)" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="hsl(142 76% 56%)" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="hsl(142 76% 56%)" stopOpacity="0.2" />
           </linearGradient>
-          <marker id="arrow-in-marker" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <polygon points="0 0, 6 3, 0 6" fill="hsl(0 70% 50%)" fillOpacity="0.8" />
-          </marker>
         </defs>
         
-        {/* Incoming arrows */}
+        {/* Incoming lines */}
         {[...Array(5)].map((_, i) => (
           <motion.line
             key={`arrow-in-${i}`}
@@ -357,15 +354,15 @@ const SingleAgentView = () => {
             x2="42"
             y2={45 + i * 2}
             stroke="url(#grad-in)"
-            strokeWidth="1.5"
-            markerEnd="url(#arrow-in-marker)"
+            strokeWidth="1"
+            strokeLinecap="round"
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0.4, 0.9, 0.4] }}
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
             transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
           />
         ))}
         
-        {/* Outgoing arrows */}
+        {/* Outgoing lines */}
         {[...Array(5)].map((_, i) => (
           <motion.line
             key={`arrow-out-${i}`}
@@ -374,9 +371,10 @@ const SingleAgentView = () => {
             x2="85"
             y2={30 + i * 8}
             stroke={i < 1 ? "url(#grad-out-success)" : "url(#grad-out-fail)"}
-            strokeWidth="1.5"
+            strokeWidth="1"
+            strokeLinecap="round"
             initial={{ opacity: 0 }}
-            animate={{ opacity: i < 1 ? [0.8, 1, 0.8] : [0.3, 0.6, 0.3] }}
+            animate={{ opacity: i < 1 ? [0.6, 0.9, 0.6] : [0.2, 0.5, 0.2] }}
             transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
           />
         ))}
@@ -529,12 +527,6 @@ const TeamAgentView = () => {
 
       {/* Command lines from Orchestrator to Leads - using viewBox for proper scaling */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={{ zIndex: 0 }}>
-        <defs>
-          <marker id="arrow-cmd-team" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <polygon points="0 0, 6 3, 0 6" fill="hsl(45 100% 60%)" fillOpacity="0.8" />
-          </marker>
-        </defs>
-        
         {/* Orchestrator to leads - percentage-based coordinates */}
         {departments.map((dept, i) => {
           // Calculate x positions for 3 departments: 20%, 50%, 80%
@@ -547,16 +539,16 @@ const TeamAgentView = () => {
                 x2={xPos}
                 y2="35"
                 stroke="hsl(45 100% 60%)"
-                strokeWidth="1.5"
-                strokeOpacity="0.7"
-                markerEnd="url(#arrow-cmd-team)"
+                strokeWidth="1"
+                strokeOpacity="0.6"
+                strokeLinecap="round"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
                 transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
               />
               {/* Animated particle */}
               <motion.circle
-                r="2"
+                r="1.5"
                 fill="hsl(45 100% 60%)"
                 initial={{ opacity: 0 }}
                 animate={{
@@ -582,9 +574,10 @@ const TeamAgentView = () => {
           x2="48"
           y2="62"
           stroke="hsl(160 70% 50%)"
-          strokeWidth="1.5"
-          strokeDasharray="4 3"
-          strokeOpacity="0.7"
+          strokeWidth="1"
+          strokeDasharray="3 2"
+          strokeOpacity="0.6"
+          strokeLinecap="round"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.2, duration: 0.5 }}
@@ -595,9 +588,10 @@ const TeamAgentView = () => {
           x2="72"
           y2="62"
           stroke="hsl(160 70% 50%)"
-          strokeWidth="1.5"
-          strokeDasharray="4 3"
-          strokeOpacity="0.7"
+          strokeWidth="1"
+          strokeDasharray="3 2"
+          strokeOpacity="0.6"
+          strokeLinecap="round"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.4, duration: 0.5 }}
