@@ -433,7 +433,6 @@ const TeamAgentView = () => {
   const [completedCount, setCompletedCount] = useState(0);
 
   useEffect(() => {
-    // Animate completion counter
     const interval = setInterval(() => {
       setCompletedCount(prev => {
         if (prev >= 10) {
@@ -478,7 +477,7 @@ const TeamAgentView = () => {
   ];
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full flex flex-col">
       {/* Grid background */}
       <div className="absolute inset-0 bg-grid-fine opacity-15" />
 
@@ -487,7 +486,7 @@ const TeamAgentView = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
-        className="absolute top-0 left-0 bg-card/80 border border-green-500/30 p-4"
+        className="absolute top-0 left-0 bg-card/80 border border-green-500/30 p-4 z-10"
       >
         <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Performance</div>
         <div className="flex items-baseline gap-1">
@@ -498,7 +497,6 @@ const TeamAgentView = () => {
           0 FAILED
         </div>
         
-        {/* Success progress bar */}
         <div className="mt-3 w-32 h-1.5 bg-muted/30 border border-green-500/20">
           <motion.div 
             className="h-full bg-green-500"
@@ -510,152 +508,129 @@ const TeamAgentView = () => {
         <div className="text-[9px] font-mono text-green-400/70 mt-1">OPTIMAL</div>
       </motion.div>
 
-      {/* Orchestrator */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="absolute left-1/2 -translate-x-1/2 top-4"
-      >
-        <AgentNode 
-          label="ORCHESTRATOR" 
-          color="hsl(45 100% 60%)" 
-          size="lg" 
-          status="active"
-        />
-      </motion.div>
+      {/* Main content area with flexbox layout */}
+      <div className="flex-1 flex flex-col items-center justify-start pt-4 pb-16">
+        {/* Orchestrator */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-4"
+        >
+          <AgentNode 
+            label="ORCHESTRATOR" 
+            color="hsl(45 100% 60%)" 
+            size="lg" 
+            status="active"
+          />
+        </motion.div>
 
-      {/* Command lines from Orchestrator to Leads - using viewBox for proper scaling */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={{ zIndex: 0 }}>
-        {/* Orchestrator to leads - percentage-based coordinates */}
-        {departments.map((dept, i) => {
-          // Calculate x positions for 3 departments: 20%, 50%, 80%
-          const xPos = 20 + i * 30;
-          return (
-            <motion.g key={dept.name}>
-              <motion.line
-                x1="50"
-                y1="18"
-                x2={xPos}
-                y2="35"
-                stroke="hsl(45 100% 60%)"
-                strokeWidth="1"
-                strokeOpacity="0.6"
-                strokeLinecap="round"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
-              />
-              {/* Animated particle */}
-              <motion.circle
-                r="1.5"
-                fill="hsl(45 100% 60%)"
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: [0, 1, 1, 0],
-                  cx: [50, xPos],
-                  cy: [18, 35]
-                }}
-                transition={{
-                  duration: 1.5,
-                  delay: 0.8 + i * 0.3,
-                  repeat: Infinity,
-                  repeatDelay: 2
-                }}
-              />
-            </motion.g>
-          );
-        })}
+        {/* Connector lines from Orchestrator to Departments - CSS based */}
+        <div className="relative w-full max-w-2xl h-10 mb-2">
+          {/* Center vertical line */}
+          <div className="absolute left-1/2 top-0 w-px h-3 bg-gradient-to-b from-yellow-400/80 to-yellow-400/40" />
+          
+          {/* Horizontal line */}
+          <div className="absolute left-[16.67%] right-[16.67%] top-3 h-px bg-gradient-to-r from-yellow-400/40 via-yellow-400/60 to-yellow-400/40" />
+          
+          {/* Vertical drops to each department */}
+          <div className="absolute left-[16.67%] top-3 w-px h-7 bg-gradient-to-b from-yellow-400/60 to-yellow-400/20">
+            <motion.div 
+              className="absolute w-1.5 h-1.5 rounded-full bg-yellow-400 -left-[2px]"
+              animate={{ top: [0, '100%'] }}
+              transition={{ duration: 1, repeat: Infinity, repeatDelay: 1.5, delay: 0 }}
+            />
+          </div>
+          <div className="absolute left-1/2 -translate-x-px top-3 w-px h-7 bg-gradient-to-b from-yellow-400/60 to-yellow-400/20">
+            <motion.div 
+              className="absolute w-1.5 h-1.5 rounded-full bg-yellow-400 -left-[2px]"
+              animate={{ top: [0, '100%'] }}
+              transition={{ duration: 1, repeat: Infinity, repeatDelay: 1.5, delay: 0.3 }}
+            />
+          </div>
+          <div className="absolute right-[16.67%] top-3 w-px h-7 bg-gradient-to-b from-yellow-400/60 to-yellow-400/20">
+            <motion.div 
+              className="absolute w-1.5 h-1.5 rounded-full bg-yellow-400 -left-[2px]"
+              animate={{ top: [0, '100%'] }}
+              transition={{ duration: 1, repeat: Infinity, repeatDelay: 1.5, delay: 0.6 }}
+            />
+          </div>
+        </div>
 
-        {/* Data flows between workers - percentage based */}
-        <motion.line
-          x1="28"
-          y1="62"
-          x2="48"
-          y2="62"
-          stroke="hsl(160 70% 50%)"
-          strokeWidth="1"
-          strokeDasharray="3 2"
-          strokeOpacity="0.6"
-          strokeLinecap="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
-        />
-        <motion.line
-          x1="52"
-          y1="62"
-          x2="72"
-          y2="62"
-          stroke="hsl(160 70% 50%)"
-          strokeWidth="1"
-          strokeDasharray="3 2"
-          strokeOpacity="0.6"
-          strokeLinecap="round"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay: 1.4, duration: 0.5 }}
-        />
-      </svg>
-
-      {/* Departments */}
-      <div className="absolute inset-x-4 top-[130px] flex justify-center gap-4 md:gap-8">
-        {departments.map((dept, deptIndex) => (
-          <motion.div
-            key={dept.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + deptIndex * 0.1 }}
-            className="flex-1 max-w-[180px]"
-          >
-            {/* Department container */}
-            <div 
-              className="border rounded-sm p-3 bg-card/40"
-              style={{ borderColor: `${dept.color}40` }}
+        {/* Departments Grid */}
+        <div className="w-full max-w-2xl grid grid-cols-3 gap-3 md:gap-4 px-2">
+          {departments.map((dept, deptIndex) => (
+            <motion.div
+              key={dept.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + deptIndex * 0.1 }}
             >
-              {/* Department name */}
               <div 
-                className="text-[10px] font-mono uppercase tracking-widest mb-3 pb-2 border-b text-center"
-                style={{ color: dept.color, borderColor: `${dept.color}30` }}
+                className="border rounded-sm p-2 md:p-3 bg-card/40"
+                style={{ borderColor: `${dept.color}40` }}
               >
-                {dept.name}
-              </div>
+                {/* Department name */}
+                <div 
+                  className="text-[9px] md:text-[10px] font-mono uppercase tracking-widest mb-2 pb-1.5 border-b text-center"
+                  style={{ color: dept.color, borderColor: `${dept.color}30` }}
+                >
+                  {dept.name}
+                </div>
 
-              {/* Lead */}
-              <div className="flex justify-center mb-4">
-                <AgentNode 
-                  label={dept.lead.label} 
-                  color={dept.color} 
-                  size="md" 
-                  status={dept.lead.status as 'active' | 'idle' | 'complete'}
-                />
-              </div>
+                {/* Lead */}
+                <div className="flex justify-center mb-2">
+                  <AgentNode 
+                    label={dept.lead.label} 
+                    color={dept.color} 
+                    size="md" 
+                    status={dept.lead.status as 'active' | 'idle' | 'complete'}
+                  />
+                </div>
 
-              {/* Workers */}
-              <div className="flex justify-center gap-2">
-                {dept.workers.map((worker, wIndex) => (
-                  <motion.div
-                    key={worker.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6 + deptIndex * 0.1 + wIndex * 0.05 }}
-                  >
-                    <AgentNode 
-                      label={worker.label} 
-                      color="hsl(185 80% 55%)" 
-                      size="sm" 
-                      status={worker.status as 'active' | 'idle' | 'complete'}
-                    />
-                  </motion.div>
-                ))}
+                {/* Connector to workers */}
+                <div className="flex justify-center mb-2">
+                  <div className="w-px h-3 bg-gradient-to-b" style={{ backgroundImage: `linear-gradient(to bottom, ${dept.color}60, ${dept.color}20)` }} />
+                </div>
+
+                {/* Workers */}
+                <div className="flex justify-center gap-1.5">
+                  {dept.workers.map((worker, wIndex) => (
+                    <motion.div
+                      key={worker.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6 + deptIndex * 0.1 + wIndex * 0.05 }}
+                    >
+                      <AgentNode 
+                        label={worker.label} 
+                        color="hsl(185 80% 55%)" 
+                        size="sm" 
+                        status={worker.status as 'active' | 'idle' | 'complete'}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Data flow indicator between departments */}
+        <div className="w-full max-w-2xl mt-3 px-2">
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-green-400/40 to-green-400/60" />
+            <motion.div 
+              className="text-[8px] font-mono text-green-400/70 uppercase tracking-widest px-2"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              Data Flow
+            </motion.div>
+            <div className="flex-1 h-px bg-gradient-to-r from-green-400/60 via-green-400/40 to-transparent" />
+          </div>
+        </div>
       </div>
-
-      {/* Data particles flowing */}
-      <DataParticles />
 
       {/* Status badges */}
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
@@ -719,48 +694,6 @@ const AgentNode = ({
         </span>
       </div>
     </div>
-  );
-};
-
-const DataParticles = () => {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden" viewBox="0 0 100 100" preserveAspectRatio="none">
-      {/* Animated particles flowing between nodes */}
-      {[...Array(6)].map((_, i) => (
-        <motion.circle
-          key={i}
-          r="0.6"
-          fill="hsl(160 70% 50%)"
-          filter="url(#glow-particle)"
-          initial={{ 
-            cx: 20, 
-            cy: 55, 
-            opacity: 0 
-          }}
-          animate={{ 
-            cx: [20, 50, 80],
-            cy: [55, 50, 55],
-            opacity: [0, 1, 1, 0]
-          }}
-          transition={{
-            duration: 3,
-            delay: i * 0.5,
-            repeat: Infinity,
-            repeatDelay: 1,
-            ease: "linear"
-          }}
-        />
-      ))}
-      <defs>
-        <filter id="glow-particle" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-    </svg>
   );
 };
 
