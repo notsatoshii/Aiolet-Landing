@@ -99,24 +99,57 @@ const SwarmManagement = () => {
                   <span className="text-[9px] font-mono text-primary/60 uppercase tracking-widest mb-3 block">
                     › Structure
                   </span>
-                  <div className="relative h-14 bg-background/50 border border-primary/20">
+                  <div className="relative h-16 bg-background/50 border border-primary/20">
                     <div className="absolute inset-0 bg-grid-fine opacity-30" />
-                    <div className="relative flex items-center justify-between h-full px-4">
+                    
+                    {/* Connection lines SVG */}
+                    <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                      <defs>
+                        <marker id="arrow-sm" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
+                          <polygon points="0 0, 4 2, 0 4" fill="hsl(var(--primary))" fillOpacity="0.5" />
+                        </marker>
+                      </defs>
+                      {[0, 1, 2].map((i) => (
+                        <motion.line
+                          key={i}
+                          x1={`${12.5 + i * 25 + 5}%`}
+                          y1="50%"
+                          x2={`${12.5 + (i + 1) * 25 - 5}%`}
+                          y2="50%"
+                          stroke="hsl(var(--primary))"
+                          strokeWidth="1"
+                          markerEnd="url(#arrow-sm)"
+                          initial={{ opacity: 0 }}
+                          animate={isInView ? { opacity: 0.5 } : {}}
+                          transition={{ delay: 0.5 + i * 0.1 }}
+                        />
+                      ))}
+                    </svg>
+                    
+                    <div className="relative flex items-center justify-around h-full px-4">
                       {["RSRCH", "WRITE", "REVW", "POST"].map((agent, i) => (
                         <motion.div
                           key={agent}
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={isInView ? { scale: 1, opacity: 1 } : {}}
                           transition={{ delay: 0.4 + i * 0.08 }}
-                          className="relative flex flex-col items-center"
+                          className="relative"
                         >
-                          <div className="w-9 h-9 bg-card border border-primary/40 flex items-center justify-center"
-                               style={{ boxShadow: '0 0 10px hsl(var(--primary) / 0.15)' }}>
-                            <span className="text-[8px] font-mono text-primary tracking-wider">{agent}</span>
+                          <div 
+                            className="w-9 h-9 bg-card border border-primary/40 flex items-center justify-center"
+                            style={{ boxShadow: '0 0 10px hsl(var(--primary) / 0.15)' }}
+                          >
+                            {/* Corner accents */}
+                            <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t border-primary" />
+                            <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t border-primary" />
+                            <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b border-primary" />
+                            <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b border-primary" />
+                            
+                            <span className="text-[7px] font-mono text-primary tracking-wider">{agent}</span>
                           </div>
-                          {i < 3 && (
-                            <div className="absolute top-1/2 -right-4 w-2 h-px bg-primary/40" />
-                          )}
+                          {/* Status dot */}
+                          <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background" 
+                               style={{ boxShadow: '0 0 4px #4ade80' }} />
                         </motion.div>
                       ))}
                     </div>
