@@ -201,36 +201,85 @@ const SingleAgentView = () => {
 };
 
 const TeamAgentView = () => {
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+
+  // Complex hierarchical structure with multiple departments
   const nodes = [
-    { label: "LEAD", x: 50, y: 15 },
-    { label: "RSRCH", x: 15, y: 45 },
-    { label: "CREATE", x: 50, y: 45 },
-    { label: "REVW", x: 85, y: 45 },
-    { label: "EXEC", x: 50, y: 78 },
+    // Executive layer
+    { id: "orchestrator", label: "ORCH", role: "Orchestrator", x: 50, y: 8, tier: "exec" },
+    
+    // Department heads
+    { id: "research-lead", label: "R-LEAD", role: "Research Lead", x: 22, y: 32, tier: "lead" },
+    { id: "content-lead", label: "C-LEAD", role: "Content Lead", x: 50, y: 32, tier: "lead" },
+    { id: "ops-lead", label: "O-LEAD", role: "Ops Lead", x: 78, y: 32, tier: "lead" },
+    
+    // Workers - Research team
+    { id: "scraper", label: "SCRP", role: "Scraper", x: 10, y: 60, tier: "worker" },
+    { id: "analyst", label: "ANLY", role: "Analyst", x: 28, y: 60, tier: "worker" },
+    
+    // Workers - Content team  
+    { id: "writer", label: "WRIT", role: "Writer", x: 42, y: 60, tier: "worker" },
+    { id: "editor", label: "EDIT", role: "Editor", x: 58, y: 60, tier: "worker" },
+    
+    // Workers - Ops team
+    { id: "qa", label: "QA", role: "QA Agent", x: 72, y: 60, tier: "worker" },
+    { id: "publisher", label: "PUB", role: "Publisher", x: 90, y: 60, tier: "worker" },
+    
+    // Shared resources
+    { id: "memory", label: "MEM", role: "Shared Memory", x: 50, y: 85, tier: "resource" },
   ];
 
   const connections = [
-    { from: { x: 50, y: 22 }, to: { x: 15, y: 38 } },
-    { from: { x: 50, y: 22 }, to: { x: 50, y: 38 } },
-    { from: { x: 50, y: 22 }, to: { x: 85, y: 38 } },
-    { from: { x: 15, y: 52 }, to: { x: 50, y: 71 } },
-    { from: { x: 50, y: 52 }, to: { x: 50, y: 71 } },
-    { from: { x: 85, y: 52 }, to: { x: 50, y: 71 } },
+    // Executive to leads
+    { from: "orchestrator", to: "research-lead", type: "command" },
+    { from: "orchestrator", to: "content-lead", type: "command" },
+    { from: "orchestrator", to: "ops-lead", type: "command" },
+    
+    // Research lead to workers
+    { from: "research-lead", to: "scraper", type: "delegate" },
+    { from: "research-lead", to: "analyst", type: "delegate" },
+    
+    // Content lead to workers
+    { from: "content-lead", to: "writer", type: "delegate" },
+    { from: "content-lead", to: "editor", type: "delegate" },
+    
+    // Ops lead to workers
+    { from: "ops-lead", to: "qa", type: "delegate" },
+    { from: "ops-lead", to: "publisher", type: "delegate" },
+    
+    // Cross-team data flows
+    { from: "analyst", to: "writer", type: "data" },
+    { from: "editor", to: "qa", type: "data" },
+    { from: "qa", to: "publisher", type: "data" },
+    
+    // Memory connections (bidirectional concept)
+    { from: "analyst", to: "memory", type: "sync" },
+    { from: "writer", to: "memory", type: "sync" },
+    { from: "qa", to: "memory", type: "sync" },
   ];
+
+  const getNodeById = (id: string) => nodes.find(n => n.id === id);
+
+  const getTierStyle = (tier: string) => {
+    switch (tier) {
+      case "exec": return { color: "hsl(45 100% 60%)", size: 44 };
+      case "lead": return { color: "hsl(var(--primary))", size: 38 };
+      case "worker": return { color: "hsl(185 80% 55%)", size: 32 };
+      case "resource": return { color: "hsl(280 80% 65%)", size: 36 };
+      default: return { color: "hsl(var(--primary))", size: 32 };
+    }
+  };
+
+  const getConnectionOpacity = (fromId: string, toId: string) => {
+    if (!hoveredNode) return 0.5;
+    if (fromId === hoveredNode || toId === hoveredNode) return 1;
+    return 0.15;
+  };
 
   return (
     <div className="relative w-full h-full">
-      {/* Layered depth effect - Team side has more depth */}
-      <motion.div 
-        className="absolute inset-0 bg-grid-fine opacity-20"
-        style={{ transform: 'translateZ(-20px)' }}
-      />
-      <motion.div 
-        className="absolute inset-0 bg-grid-fine opacity-40"
-        style={{ transform: 'translateZ(0px)' }}
-      />
+      <div className="absolute inset-0 bg-grid-fine opacity-25" />
       
-      {/* Connections SVG */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="glow-team" x="-50%" y="-50%" width="200%" height="200%">
@@ -240,90 +289,127 @@ const TeamAgentView = () => {
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          <marker id="arrow-team" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
-            <polygon points="0 0, 4 2, 0 4" fill="hsl(var(--primary))" fillOpacity="0.5" />
+          <marker id="arrow-cmd" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
+            <polygon points="0 0, 4 2, 0 4" fill="hsl(var(--primary))" fillOpacity="0.7" />
+          </marker>
+          <marker id="arrow-data" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
+            <polygon points="0 0, 4 2, 0 4" fill="hsl(160 100% 50%)" fillOpacity="0.7" />
+          </marker>
+          <marker id="arrow-sync" markerWidth="3" markerHeight="3" refX="2" refY="1.5" orient="auto">
+            <polygon points="0 0, 3 1.5, 0 3" fill="hsl(280 80% 65%)" fillOpacity="0.7" />
           </marker>
         </defs>
         
-        {connections.map((conn, i) => (
-          <motion.line
-            key={i}
-            x1={`${conn.from.x}%`}
-            y1={`${conn.from.y}%`}
-            x2={`${conn.to.x}%`}
-            y2={`${conn.to.y}%`}
-            stroke="hsl(var(--primary))"
-            strokeWidth="0.8"
-            markerEnd="url(#arrow-team)"
-            filter="url(#glow-team)"
-            initial={{ opacity: 0, pathLength: 0 }}
-            animate={{ opacity: 0.6, pathLength: 1 }}
-            transition={{ duration: 0.5, delay: 0.15 + i * 0.05, ease: "easeOut" }}
-          />
-        ))}
+        {connections.map((conn, i) => {
+          const from = getNodeById(conn.from);
+          const to = getNodeById(conn.to);
+          if (!from || !to) return null;
+          
+          const opacity = getConnectionOpacity(conn.from, conn.to);
+          const isData = conn.type === "data";
+          const isSync = conn.type === "sync";
+          const strokeColor = isSync 
+            ? "hsl(280 80% 65%)" 
+            : isData 
+              ? "hsl(160 100% 50%)" 
+              : "hsl(var(--primary))";
+          const markerId = isSync ? "arrow-sync" : isData ? "arrow-data" : "arrow-cmd";
+          
+          return (
+            <motion.line
+              key={i}
+              x1={`${from.x}%`}
+              y1={`${from.y + 4}%`}
+              x2={`${to.x}%`}
+              y2={`${to.y - 2}%`}
+              stroke={strokeColor}
+              strokeWidth={isSync ? 0.5 : 0.8}
+              strokeDasharray={isData || isSync ? "3 2" : "none"}
+              markerEnd={`url(#${markerId})`}
+              filter="url(#glow-team)"
+              initial={{ opacity: 0, pathLength: 0 }}
+              animate={{ opacity: opacity * 0.7, pathLength: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 + i * 0.03, ease: "easeOut" }}
+            />
+          );
+        })}
       </svg>
 
-      {/* Central context hub */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.4, ease: "easeOut" }}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      >
-        <div className="relative w-10 h-10">
-          <div className="absolute inset-0 bg-primary/20 blur-lg" />
-          <div className="relative w-full h-full bg-primary/10 border border-primary/40 rotate-45 flex items-center justify-center"
-               style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.25)' }}>
-            <div className="w-3 h-3 bg-primary/50 -rotate-45 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-primary" />
-            </div>
-          </div>
-        </div>
-        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/50 uppercase tracking-widest whitespace-nowrap">
-          Context
-        </span>
-      </motion.div>
-
       {/* Agent nodes */}
-      {nodes.map((node, i) => (
-        <motion.div
-          key={node.label}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.08 + i * 0.06, duration: 0.4, ease: "easeOut" }}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${node.x}%`, top: `${node.y}%` }}
-        >
-          <div className="relative group">
-            <motion.div 
-              className="absolute -inset-1 bg-primary/10 blur-md opacity-0 group-hover:opacity-100"
-              transition={{ duration: 0.3 }}
-            />
-            <motion.div 
-              className="relative w-12 h-12 bg-card border border-primary/40 flex items-center justify-center cursor-pointer"
-              whileHover={{ 
-                scale: 1.03, 
-                borderColor: 'hsl(var(--primary))',
-                backgroundColor: 'hsl(var(--primary) / 0.1)',
-              }}
-              transition={{ duration: 0.25 }}
-              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.12)' }}
-            >
-              <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
-              <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
-              <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
-              <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
+      {nodes.map((node, i) => {
+        const style = getTierStyle(node.tier);
+        const isHovered = hoveredNode === node.id;
+        const isDimmed = hoveredNode && !isHovered;
+        const sizePx = style.size;
+        
+        return (
+          <motion.div
+            key={node.id}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: isHovered ? 1.06 : 1, opacity: isDimmed ? 0.35 : 1 }}
+            transition={{ delay: 0.05 + i * 0.03, duration: 0.4, ease: "easeOut" }}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ left: `${node.x}%`, top: `${node.y}%` }}
+            onMouseEnter={() => setHoveredNode(node.id)}
+            onMouseLeave={() => setHoveredNode(null)}
+          >
+            <div className="relative group cursor-pointer">
+              <motion.div 
+                className="absolute -inset-1.5 blur-md"
+                style={{ backgroundColor: style.color }}
+                animate={{ opacity: isHovered ? 0.3 : 0 }}
+                transition={{ duration: 0.25 }}
+              />
+              <motion.div 
+                className="relative flex items-center justify-center bg-card border"
+                style={{ 
+                  width: sizePx, 
+                  height: sizePx,
+                  borderColor: style.color,
+                  borderRadius: node.tier === "resource" ? "50%" : "2px",
+                  boxShadow: isHovered 
+                    ? `0 0 20px ${style.color}50` 
+                    : `0 0 8px ${style.color}20`
+                }}
+                whileHover={{ backgroundColor: `${style.color}15` }}
+                transition={{ duration: 0.25 }}
+              >
+                {node.tier !== "resource" && (
+                  <>
+                    <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t" style={{ borderColor: style.color }} />
+                    <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t" style={{ borderColor: style.color }} />
+                    <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b" style={{ borderColor: style.color }} />
+                    <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b" style={{ borderColor: style.color }} />
+                  </>
+                )}
+                
+                <div 
+                  className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background rounded-full" 
+                  style={{ boxShadow: '0 0 4px #4ade80' }} 
+                />
+                
+                <span 
+                  className="text-[8px] font-mono uppercase tracking-wider"
+                  style={{ color: style.color }}
+                >
+                  {node.label}
+                </span>
+              </motion.div>
               
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
-                   style={{ boxShadow: '0 0 6px #4ade80' }} />
-              
-              <span className="text-[9px] font-mono text-primary uppercase tracking-wider">
-                {node.label}
-              </span>
-            </motion.div>
-          </div>
-        </motion.div>
-      ))}
+              {/* Tooltip */}
+              <motion.div
+                initial={{ opacity: 0, y: 3 }}
+                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 3 }}
+                transition={{ duration: 0.2 }}
+                className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-card border whitespace-nowrap pointer-events-none z-10"
+                style={{ borderColor: `${style.color}60` }}
+              >
+                <span className="text-[8px] font-mono" style={{ color: style.color }}>{node.role}</span>
+              </motion.div>
+            </div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 };
