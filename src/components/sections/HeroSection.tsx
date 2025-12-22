@@ -28,9 +28,9 @@ const HeroSection = () => {
         index++;
       } else {
         clearInterval(timer);
-        setTimeout(() => setShowWorkflow(true), 500);
+        setTimeout(() => setShowWorkflow(true), 300);
       }
-    }, 35);
+    }, 25);
     return () => clearInterval(timer);
   }, []);
 
