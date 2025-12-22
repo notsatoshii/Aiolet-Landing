@@ -8,16 +8,10 @@ import Marketplace from "@/components/sections/Marketplace";
 import WhoItsFor from "@/components/sections/WhoItsFor";
 import FinalCTA from "@/components/sections/FinalCTA";
 import Footer from "@/components/sections/Footer";
-import DotScreenShader from "@/components/ui/dot-screen-shader";
 
 const Index = () => {
   return (
-    <>
-      {/* Interactive dot grid background - renders behind everything */}
-      <DotScreenShader />
-      
-      <main className="relative z-10 min-h-screen overflow-x-hidden">
-      
+    <main className="relative min-h-screen bg-background overflow-x-hidden">
       <Header />
       <HeroSection />
       <section id="features">
@@ -36,8 +30,7 @@ const Index = () => {
         <FinalCTA />
       </section>
       <Footer />
-      </main>
-    </>
+    </main>
   );
 };
 
