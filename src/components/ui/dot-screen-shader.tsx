@@ -1,180 +1,140 @@
-'use client'
+import { useRef, useEffect, useCallback } from 'react'
 
-import { useMemo, useEffect } from 'react'
-import { Canvas, ThreeEvent, useFrame, useThree } from '@react-three/fiber'
-import { shaderMaterial, useTrailTexture } from '@react-three/drei'
-import * as THREE from 'three'
-import { extend } from '@react-three/fiber'
-
-const DotMaterial = shaderMaterial(
-  {
-    time: 0,
-    resolution: new THREE.Vector2(),
-    dotColor: new THREE.Color('#22d3ee'),
-    bgColor: new THREE.Color('#09090b'),
-    mouseTrail: null as THREE.Texture | null,
-    render: 0,
-    rotation: 0,
-    gridSize: 50,
-    dotOpacity: 0.05
-  },
-  /* glsl */ `
-    void main() {
-      gl_Position = vec4(position.xy, 0.0, 1.0);
-    }
-  `,
-  /* glsl */ `
-    uniform float time;
-    uniform int render;
-    uniform vec2 resolution;
-    uniform vec3 dotColor;
-    uniform vec3 bgColor;
-    uniform sampler2D mouseTrail;
-    uniform float rotation;
-    uniform float gridSize;
-    uniform float dotOpacity;
-
-    vec2 rotate(vec2 uv, float angle) {
-        float s = sin(angle);
-        float c = cos(angle);
-        mat2 rotationMatrix = mat2(c, -s, s, c);
-        return rotationMatrix * (uv - 0.5) + 0.5;
-    }
-
-    vec2 coverUv(vec2 uv) {
-      vec2 s = resolution.xy / max(resolution.x, resolution.y);
-      vec2 newUv = (uv - 0.5) * s + 0.5;
-      return clamp(newUv, 0.0, 1.0);
-    }
-
-    float sdfCircle(vec2 p, float r) {
-        return length(p - 0.5) - r;
-    }
-
-    void main() {
-      vec2 screenUv = gl_FragCoord.xy / resolution;
-      vec2 uv = coverUv(screenUv);
-
-      vec2 rotatedUv = rotate(uv, rotation);
-
-      // Create a grid
-      vec2 gridUv = fract(rotatedUv * gridSize);
-      vec2 gridUvCenterInScreenCoords = rotate((floor(rotatedUv * gridSize) + 0.5) / gridSize, -rotation);
-
-      // Calculate distance from the center of each cell
-      float baseDot = sdfCircle(gridUv, 0.25);
-
-      // Screen mask
-      float screenMask = smoothstep(0.0, 1.0, 1.0 - uv.y);
-      vec2 centerDisplace = vec2(0.7, 1.1);
-      float circleMaskCenter = length(uv - centerDisplace);
-      float circleMaskFromCenter = smoothstep(0.5, 1.0, circleMaskCenter);
-      
-      float combinedMask = screenMask * circleMaskFromCenter;
-      float circleAnimatedMask = sin(time * 2.0 + circleMaskCenter * 10.0);
-
-      // Mouse trail effect
-      float mouseInfluence = texture2D(mouseTrail, gridUvCenterInScreenCoords).r;
-      
-      float scaleInfluence = max(mouseInfluence * 0.5, circleAnimatedMask * 0.3);
-
-      // Create dots with animated scale, influenced by mouse
-      float dotSize = min(pow(circleMaskCenter, 2.0) * 0.3, 0.3);
-
-      float sdfDot = sdfCircle(gridUv, dotSize * (1.0 + scaleInfluence * 0.5));
-
-      float smoothDot = smoothstep(0.05, 0.0, sdfDot);
-
-      float opacityInfluence = max(mouseInfluence * 50.0, circleAnimatedMask * 0.5);
-
-      // Mix background color with dot color
-      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * dotOpacity * (1.0 + opacityInfluence));
-
-      gl_FragColor = vec4(composition, 1.0);
-    }
-  `
-)
-
-// Extend Three.js with custom material
-extend({ DotMaterial })
-
-// Add type declaration for JSX
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      dotMaterial: any
-    }
-  }
+interface DotScreenShaderProps {
+  dotColor?: string
+  bgColor?: string
+  gridSize?: number
+  dotOpacity?: number
 }
 
-function Scene() {
-  const size = useThree((s) => s.size)
-  const viewport = useThree((s) => s.viewport)
-  
-  const rotation = 0
-  const gridSize = 80
+export const DotScreenShader = ({
+  dotColor = '#22d3ee',
+  bgColor = '#09090b',
+  gridSize = 60,
+  dotOpacity = 0.08
+}: DotScreenShaderProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 })
+  const animationRef = useRef<number>()
+  const timeRef = useRef(0)
 
-  // Using cyan theme colors matching the site
-  const themeColors = {
-    dotColor: '#22d3ee', // Primary cyan
-    bgColor: '#09090b',  // Background
-    dotOpacity: 0.04
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 }
   }
 
-  const [trail, onMove] = useTrailTexture({
-    size: 512,
-    radius: 0.1,
-    maxAge: 400,
-    interpolate: 1,
-    ease: function easeInOutCirc(x: number) {
-      return x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
-    }
-  })
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-  const dotMaterial = useMemo(() => {
-    return new DotMaterial()
-  }, [])
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const width = canvas.width
+    const height = canvas.height
+    const dot = hexToRgb(dotColor)
+    const bg = hexToRgb(bgColor)
+
+    // Smooth mouse following
+    mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.1
+    mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.1
+
+    // Clear with background
+    ctx.fillStyle = bgColor
+    ctx.fillRect(0, 0, width, height)
+
+    const cellSize = Math.max(width, height) / gridSize
+    const cols = Math.ceil(width / cellSize) + 1
+    const rows = Math.ceil(height / cellSize) + 1
+
+    timeRef.current += 0.016
+
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        const x = i * cellSize + cellSize / 2
+        const y = j * cellSize + cellSize / 2
+
+        // Distance from center of screen
+        const centerX = width * 0.7
+        const centerY = height * 1.1
+        const distFromCenter = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+        const maxDist = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
+        const normalizedDist = distFromCenter / maxDist
+
+        // Mouse influence
+        const distFromMouse = Math.sqrt(
+          Math.pow(x - mouseRef.current.x, 2) + 
+          Math.pow(y - mouseRef.current.y, 2)
+        )
+        const mouseInfluence = Math.max(0, 1 - distFromMouse / 200)
+
+        // Animated wave
+        const wave = Math.sin(timeRef.current * 2 + normalizedDist * 10) * 0.3 + 0.7
+
+        // Calculate dot size
+        const baseSize = Math.min(normalizedDist * normalizedDist * cellSize * 0.4, cellSize * 0.35)
+        const size = baseSize * (1 + mouseInfluence * 0.5) * wave
+
+        // Calculate opacity
+        const screenMask = 1 - (y / height) * 0.5
+        const circleMask = Math.min(1, normalizedDist * 1.5)
+        const opacity = dotOpacity * screenMask * circleMask * (1 + mouseInfluence * 3)
+
+        if (size > 0.5 && opacity > 0.001) {
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${dot.r}, ${dot.g}, ${dot.b}, ${opacity})`
+          ctx.fill()
+        }
+      }
+    }
+
+    animationRef.current = requestAnimationFrame(draw)
+  }, [dotColor, bgColor, gridSize, dotOpacity])
 
   useEffect(() => {
-    dotMaterial.uniforms.dotColor.value.setStyle(themeColors.dotColor)
-    dotMaterial.uniforms.bgColor.value.setStyle(themeColors.bgColor)
-    dotMaterial.uniforms.dotOpacity.value = themeColors.dotOpacity
-  }, [dotMaterial, themeColors])
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-  useFrame((state) => {
-    dotMaterial.uniforms.time.value = state.clock.elapsedTime
-    dotMaterial.uniforms.resolution.value.set(size.width * viewport.dpr, size.height * viewport.dpr)
-    dotMaterial.uniforms.mouseTrail.value = trail
-    dotMaterial.uniforms.rotation.value = rotation
-    dotMaterial.uniforms.gridSize.value = gridSize
-  })
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      canvas.style.width = `${window.innerWidth}px`
+      canvas.style.height = `${window.innerHeight}px`
+    }
 
-  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
-    onMove(e)
-  }
+    const handleMouseMove = (e: MouseEvent) => {
+      const dpr = window.devicePixelRatio || 1
+      mouseRef.current.targetX = e.clientX * dpr
+      mouseRef.current.targetY = e.clientY * dpr
+    }
 
-  const scale = Math.max(viewport.width, viewport.height) / 2
+    resize()
+    window.addEventListener('resize', resize)
+    window.addEventListener('mousemove', handleMouseMove)
+    
+    animationRef.current = requestAnimationFrame(draw)
+
+    return () => {
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('mousemove', handleMouseMove)
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [draw])
 
   return (
-    <mesh scale={[scale * 4, scale * 4, 1]} onPointerMove={handlePointerMove}>
-      <planeGeometry />
-      <primitive object={dotMaterial} attach="material" />
-    </mesh>
-  )
-}
-
-export const DotScreenShader = () => {
-  return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
-      <Canvas
-        className="pointer-events-auto"
-        gl={{ antialias: false, alpha: false }}
-        dpr={[1, 2]}
-        camera={{ position: [0, 0, 1] }}
-      >
-        <Scene />
-      </Canvas>
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: -1 }}
+    />
   )
 }
 
