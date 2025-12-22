@@ -1,9 +1,8 @@
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { 
   Lightbulb, Brain, TrendingUp, Handshake, 
-  Megaphone, Headphones, LineChart, Video,
-  ChevronDown
+  Megaphone, Headphones, LineChart, Video
 } from "lucide-react";
 import { InfiniteGridCard } from "@/components/ui/infinite-grid-card";
 
@@ -15,14 +14,12 @@ interface Template {
   description: string;
   agents: string[];
   tools: string[];
-  whyItMatters: string;
   category: "core" | "specialized";
 }
 
 const Templates = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   const templates: Template[] = [
     // Core Templates
@@ -34,7 +31,6 @@ const Templates = () => {
       description: "Turns raw ideas into scoped features. Breaks ideas into tasks, milestones, and priorities. Flags technical and UX risks early.",
       agents: ["Product Strategist", "Technical Architect", "UX Reviewer"],
       tools: ["Cursor", "Linear", "Notion", "GitHub"],
-      whyItMatters: "Removes the \"where do I even start?\" tax that kills momentum.",
       category: "core"
     },
     {
@@ -45,7 +41,6 @@ const Templates = () => {
       description: "Stores context across projects, ideas, and conversations. Helps with prioritization and tradeoffs. Answers \"What should I work on today?\"",
       agents: ["Memory Agent", "Strategy Agent", "Execution Planner"],
       tools: ["Notion", "Slack", "Calendar", "MCPs"],
-      whyItMatters: "Founders don't need more ideas. They need fewer decisions.",
       category: "core"
     },
     {
@@ -56,7 +51,6 @@ const Templates = () => {
       description: "Scans trends and competitors. Generates content ideas. Handles replies, engagement, and iteration loops.",
       agents: ["Trend Scanner", "Content Generator", "Engagement Agent", "Performance Analyst"],
       tools: ["Twitter/X", "LinkedIn", "Reddit", "Analytics"],
-      whyItMatters: "Turns growth from \"hope\" into a system.",
       category: "core"
     },
     {
@@ -67,7 +61,6 @@ const Templates = () => {
       description: "Researches leads and partners. Qualifies them automatically. Crafts personalized outreach and follow-ups. Maintains CRM memory.",
       agents: ["Research Agent", "Qualification Agent", "Outreach Agent", "Follow-up Agent"],
       tools: ["LinkedIn", "Email", "HubSpot", "Apollo"],
-      whyItMatters: "Replaces an entire SDR motion for early teams.",
       category: "core"
     },
     {
@@ -78,7 +71,6 @@ const Templates = () => {
       description: "Plans campaigns end-to-end. Generates copy, visuals, and launch timelines. Coordinates multi-channel releases.",
       agents: ["Campaign Strategist", "Copy Agent", "Creative Agent", "QA / Brand Guard"],
       tools: ["Figma", "Canva", "Twitter/X", "Mailchimp"],
-      whyItMatters: "Campaigns stop being one-off chaos and start compounding.",
       category: "core"
     },
     {
@@ -89,7 +81,6 @@ const Templates = () => {
       description: "Handles frontline support. Diagnoses issues internally. Escalates only when needed. Learns from past tickets.",
       agents: ["Frontline Support Agent", "Diagnostic Agent", "Knowledge Agent", "Escalation Agent"],
       tools: ["Intercom", "Zendesk", "Slack", "Telegram"],
-      whyItMatters: "Support becomes leverage, not a bottleneck.",
       category: "core"
     },
     // Specialized Templates
@@ -101,7 +92,6 @@ const Templates = () => {
       description: "Ingests on-chain data, news, and social signals. Detects narrative shifts and anomalies. Stress-tests positions and scenarios.",
       agents: ["Data Ingestion Agent", "Signal Detection Agent", "Risk & Scenario Agent", "Decision Assistant"],
       tools: ["Telegram", "Dune", "DefiLlama", "Twitter/X"],
-      whyItMatters: "This isn't \"AI trading.\" It's AI thinking with you.",
       category: "specialized"
     },
     {
@@ -112,7 +102,6 @@ const Templates = () => {
       description: "Turns long-form ideas into shorts, threads, and posts. Maintains voice and style. Optimizes timing, hooks, and formats.",
       agents: ["Ideation Agent", "Repurposing Agent", "Style & Voice Agent", "Analytics Agent"],
       tools: ["YouTube", "TikTok", "Twitter/X", "Opus Clip"],
-      whyItMatters: "Creators stay creative. The factory handles scale.",
       category: "specialized"
     },
   ];
@@ -154,8 +143,6 @@ const Templates = () => {
                 template={t} 
                 index={i} 
                 isInView={isInView}
-                isExpanded={expandedCard === t.title}
-                onToggle={() => setExpandedCard(expandedCard === t.title ? null : t.title)}
               />
             ))}
           </div>
@@ -180,8 +167,6 @@ const Templates = () => {
                 template={t} 
                 index={i + coreTemplates.length} 
                 isInView={isInView}
-                isExpanded={expandedCard === t.title}
-                onToggle={() => setExpandedCard(expandedCard === t.title ? null : t.title)}
                 isSpecialized
               />
             ))}
@@ -196,15 +181,11 @@ const TemplateCard = ({
   template, 
   index, 
   isInView, 
-  isExpanded, 
-  onToggle,
   isSpecialized = false 
 }: { 
   template: Template; 
   index: number; 
   isInView: boolean;
-  isExpanded: boolean;
-  onToggle: () => void;
   isSpecialized?: boolean;
 }) => {
   const Icon = template.icon;
@@ -277,7 +258,7 @@ const TemplateCard = ({
           </div>
 
           {/* Used Tools */}
-          <div className="mb-3">
+          <div>
             <span className="text-[8px] font-mono text-muted-foreground/50 uppercase tracking-widest block mb-1.5">Integrations</span>
             <div className="flex gap-1.5 flex-wrap">
               {template.tools.map((tool) => (
@@ -290,31 +271,6 @@ const TemplateCard = ({
               ))}
             </div>
           </div>
-
-          {/* Expand/Collapse */}
-          <button 
-            onClick={onToggle}
-            className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <span>Why it matters</span>
-            <ChevronDown 
-              className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-            />
-          </button>
-
-          {/* Expanded Content */}
-          {isExpanded && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-3 pt-3 border-t border-primary/20"
-            >
-              <p className="text-[11px] text-foreground/80 italic leading-relaxed">
-                "{template.whyItMatters}"
-              </p>
-            </motion.div>
-          )}
         </div>
       </InfiniteGridCard>
     </motion.div>
