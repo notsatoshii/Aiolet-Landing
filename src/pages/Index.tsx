@@ -1,13 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Header from "@/components/sections/Header";
+import HeroSection from "@/components/sections/HeroSection";
+import WhatIsAiolet from "@/components/sections/WhatIsAiolet";
+import WhyAITeams from "@/components/sections/WhyAITeams";
+import SwarmManagement from "@/components/sections/SwarmManagement";
+import Templates from "@/components/sections/Templates";
+import Marketplace from "@/components/sections/Marketplace";
+import WhoItsFor from "@/components/sections/WhoItsFor";
+import FinalCTA from "@/components/sections/FinalCTA";
+import Footer from "@/components/sections/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <main className="relative min-h-screen bg-background overflow-x-hidden">
+      <Header />
+      <HeroSection />
+      <section id="features">
+        <WhatIsAiolet />
+      </section>
+      <WhyAITeams />
+      <SwarmManagement />
+      <section id="templates">
+        <Templates />
+      </section>
+      <section id="marketplace">
+        <Marketplace />
+      </section>
+      <WhoItsFor />
+      <section id="waitlist">
+        <FinalCTA />
+      </section>
+      <Footer />
+    </main>
   );
 };
 
