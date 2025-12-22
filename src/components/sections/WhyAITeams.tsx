@@ -328,51 +328,62 @@ const SingleAgentView = () => {
         </div>
       </motion.div>
 
-      {/* Incoming arrows */}
-      {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={`arrow-in-${i}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 + i * 0.1 }}
-          className="absolute"
-          style={{
-            left: '25%',
-            top: `${30 + i * 10}%`,
-            width: '20%',
-          }}
-        >
-          <motion.div
-            className="h-px bg-gradient-to-r from-red-500/30 to-red-500"
-            animate={{ opacity: [0.3, 0.8, 0.3] }}
-            transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
-          />
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-red-500 border-y-2 border-y-transparent" />
-        </motion.div>
-      ))}
-
-      {/* Outgoing arrows (mostly failing) */}
-      {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={`arrow-out-${i}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 + i * 0.1 }}
-          className="absolute"
-          style={{
-            left: '55%',
-            top: `${30 + i * 10}%`,
-            width: '20%',
-          }}
-        >
-          <motion.div
-            className={`h-px ${i < 1 ? 'bg-gradient-to-r from-green-500 to-green-500/30' : 'bg-gradient-to-r from-red-500/50 to-red-500/10'}`}
+      {/* Incoming arrows - responsive using percentages */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {[...Array(5)].map((_, i) => (
+          <motion.g key={`arrow-in-${i}`}>
+            <motion.line
+              x1="15"
+              y1={30 + i * 10}
+              x2="40"
+              y2={45 + i * 2}
+              stroke="url(#grad-in)"
+              strokeWidth="0.3"
+              vectorEffect="non-scaling-stroke"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.3, 0.8, 0.3] }}
+              transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+            />
+            <polygon 
+              points="40,43 40,47 43,45" 
+              fill="hsl(0 70% 50%)" 
+              opacity="0.8"
+              style={{ transform: `translateY(${i * 2}px)` }}
+            />
+          </motion.g>
+        ))}
+        <defs>
+          <linearGradient id="grad-in" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="hsl(0 70% 50%)" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="hsl(0 70% 50%)" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="grad-out-fail" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="hsl(0 70% 50%)" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="hsl(0 70% 50%)" stopOpacity="0.1" />
+          </linearGradient>
+          <linearGradient id="grad-out-success" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="hsl(142 76% 56%)" stopOpacity="1" />
+            <stop offset="100%" stopColor="hsl(142 76% 56%)" stopOpacity="0.3" />
+          </linearGradient>
+        </defs>
+        
+        {/* Outgoing arrows */}
+        {[...Array(5)].map((_, i) => (
+          <motion.line
+            key={`arrow-out-${i}`}
+            x1="60"
+            y1={45 + i * 2}
+            x2="85"
+            y2={30 + i * 10}
+            stroke={i < 1 ? "url(#grad-out-success)" : "url(#grad-out-fail)"}
+            strokeWidth="0.3"
+            vectorEffect="non-scaling-stroke"
+            initial={{ opacity: 0 }}
             animate={{ opacity: i < 1 ? [0.8, 1, 0.8] : [0.2, 0.5, 0.2] }}
             transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
           />
-        </motion.div>
-      ))}
-
+        ))}
+      </svg>
       {/* Status badges */}
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
         <StatusLabel label="Bottlenecks" variant="error" />
@@ -519,27 +530,29 @@ const TeamAgentView = () => {
         />
       </motion.div>
 
-      {/* Command lines from Orchestrator to Leads */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+      {/* Command lines from Orchestrator to Leads - using viewBox for proper scaling */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 0 }}>
         <defs>
           <marker id="arrow-cmd-team" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
             <polygon points="0 0, 6 3, 0 6" fill="hsl(45 100% 60%)" fillOpacity="0.8" />
           </marker>
         </defs>
         
-        {/* Orchestrator to leads */}
+        {/* Orchestrator to leads - percentage-based coordinates */}
         {departments.map((dept, i) => {
+          // Calculate x positions for 3 departments: 20%, 50%, 80%
           const xPos = 20 + i * 30;
           return (
             <motion.g key={dept.name}>
               <motion.line
-                x1="50%"
-                y1="80"
-                x2={`${xPos + 5}%`}
-                y2="140"
+                x1="50"
+                y1="18"
+                x2={xPos}
+                y2="32"
                 stroke="hsl(45 100% 60%)"
-                strokeWidth="2"
+                strokeWidth="0.4"
                 strokeOpacity="0.6"
+                vectorEffect="non-scaling-stroke"
                 markerEnd="url(#arrow-cmd-team)"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
@@ -547,13 +560,13 @@ const TeamAgentView = () => {
               />
               {/* Animated particle */}
               <motion.circle
-                r="3"
+                r="0.8"
                 fill="hsl(45 100% 60%)"
                 initial={{ opacity: 0 }}
                 animate={{
                   opacity: [0, 1, 1, 0],
-                  cx: ['50%', `${xPos + 5}%`],
-                  cy: [80, 140]
+                  cx: [50, xPos],
+                  cy: [18, 32]
                 }}
                 transition={{
                   duration: 1.5,
@@ -566,29 +579,31 @@ const TeamAgentView = () => {
           );
         })}
 
-        {/* Data flows between workers */}
+        {/* Data flows between workers - percentage based */}
         <motion.line
-          x1="30%"
-          y1="280"
-          x2="50%"
-          y2="280"
+          x1="30"
+          y1="60"
+          x2="50"
+          y2="60"
           stroke="hsl(160 70% 50%)"
-          strokeWidth="1.5"
-          strokeDasharray="6 4"
+          strokeWidth="0.4"
+          strokeDasharray="1.5 1"
           strokeOpacity="0.6"
+          vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.2, duration: 0.5 }}
         />
         <motion.line
-          x1="60%"
-          y1="280"
-          x2="78%"
-          y2="280"
+          x1="60"
+          y1="60"
+          x2="78"
+          y2="60"
           stroke="hsl(160 70% 50%)"
-          strokeWidth="1.5"
-          strokeDasharray="6 4"
+          strokeWidth="0.4"
+          strokeDasharray="1.5 1"
           strokeOpacity="0.6"
+          vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.4, duration: 0.5 }}
@@ -721,21 +736,22 @@ const AgentNode = ({
 
 const DataParticles = () => {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden" viewBox="0 0 100 100" preserveAspectRatio="none">
       {/* Animated particles flowing between nodes */}
       {[...Array(6)].map((_, i) => (
-        <motion.div
+        <motion.circle
           key={i}
-          className="absolute w-1.5 h-1.5 bg-green-400 rounded-full"
-          style={{ boxShadow: '0 0 8px hsl(160 70% 50%)' }}
+          r="0.6"
+          fill="hsl(160 70% 50%)"
+          filter="url(#glow-particle)"
           initial={{ 
-            x: '20%', 
-            y: '55%', 
+            cx: 20, 
+            cy: 55, 
             opacity: 0 
           }}
           animate={{ 
-            x: ['20%', '50%', '80%'],
-            y: ['55%', '50%', '55%'],
+            cx: [20, 50, 80],
+            cy: [55, 50, 55],
             opacity: [0, 1, 1, 0]
           }}
           transition={{
@@ -747,7 +763,16 @@ const DataParticles = () => {
           }}
         />
       ))}
-    </div>
+      <defs>
+        <filter id="glow-particle" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+    </svg>
   );
 };
 
