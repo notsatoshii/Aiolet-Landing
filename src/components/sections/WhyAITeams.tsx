@@ -1,4 +1,4 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { SciFiPanel } from "@/components/ui/scifi-panel";
 
@@ -7,16 +7,27 @@ const WhyAITeams = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [activeView, setActiveView] = useState<"single" | "team">("single");
 
+  // Parallax for depth effect
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const bgY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+
   return (
     <section ref={ref} className="relative py-24 lg:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/3 to-background" />
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-b from-background via-primary/3 to-background" 
+        style={{ y: bgY }}
+      />
       <div className="absolute inset-0 noise-overlay" />
 
       <div className="container relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-primary/10 border border-primary/30 text-primary text-[10px] font-mono uppercase tracking-widest mb-6">
@@ -44,7 +55,7 @@ const WhyAITeams = () => {
           <div className="inline-flex bg-card border border-primary/30">
             <button
               onClick={() => setActiveView("single")}
-              className={`px-5 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-200 ${
+              className={`px-5 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 ${
                 activeView === "single"
                   ? "bg-primary/20 text-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -54,7 +65,7 @@ const WhyAITeams = () => {
             </button>
             <button
               onClick={() => setActiveView("team")}
-              className={`px-5 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-200 ${
+              className={`px-5 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 ${
                 activeView === "team"
                   ? "bg-primary/20 text-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -75,24 +86,40 @@ const WhyAITeams = () => {
           <SciFiPanel label={activeView === "single" ? "Single Agent Mode" : "Team Mode"}>
             <div className="p-6 md:p-10">
               <div className="relative h-[280px] md:h-[320px]">
-                {activeView === "single" ? <SingleAgentView /> : <TeamAgentView />}
+                <motion.div
+                  key={activeView}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  {activeView === "single" ? <SingleAgentView /> : <TeamAgentView />}
+                </motion.div>
               </div>
 
               {/* Status Labels */}
               <div className="mt-6 flex flex-wrap justify-center gap-3">
-                {activeView === "single" ? (
-                  <>
-                    <StatusLabel label="Bottlenecks" variant="error" />
-                    <StatusLabel label="Fragile" variant="error" />
-                    <StatusLabel label="Limited" variant="error" />
-                  </>
-                ) : (
-                  <>
-                    <StatusLabel label="Parallel" variant="success" />
-                    <StatusLabel label="Structured" variant="success" />
-                    <StatusLabel label="Reliable" variant="success" />
-                  </>
-                )}
+                <motion.div
+                  key={`labels-${activeView}`}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                  className="flex flex-wrap justify-center gap-3"
+                >
+                  {activeView === "single" ? (
+                    <>
+                      <StatusLabel label="Bottlenecks" variant="error" />
+                      <StatusLabel label="Fragile" variant="error" />
+                      <StatusLabel label="Limited" variant="error" />
+                    </>
+                  ) : (
+                    <>
+                      <StatusLabel label="Parallel" variant="success" />
+                      <StatusLabel label="Structured" variant="success" />
+                      <StatusLabel label="Reliable" variant="success" />
+                    </>
+                  )}
+                </motion.div>
               </div>
             </div>
           </SciFiPanel>
@@ -127,14 +154,17 @@ const SingleAgentView = () => {
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative"
       >
         {/* Central overloaded node */}
         <div className="relative">
-          <div className="absolute inset-0 bg-red-500/20 blur-xl animate-pulse" />
+          <motion.div 
+            className="absolute inset-0 bg-red-500/20 blur-xl"
+            animate={{ opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
           <div className="relative w-24 h-24 bg-card border-2 border-red-500/50 flex items-center justify-center">
-            {/* Corner accents */}
             <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-red-500" />
             <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-red-500" />
             <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-red-500" />
@@ -143,9 +173,6 @@ const SingleAgentView = () => {
             <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest">Overload</span>
           </div>
         </div>
-        
-        {/* Warning pulse */}
-        <div className="absolute inset-0 border-2 border-red-500/30 animate-ping" style={{ animationDuration: '2s' }} />
 
         {/* Chaotic connections */}
         {[0, 72, 144, 216, 288].map((angle, i) => (
@@ -153,7 +180,7 @@ const SingleAgentView = () => {
             key={i}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 + i * 0.08 }}
+            transition={{ delay: 0.2 + i * 0.08, duration: 0.4, ease: "easeOut" }}
             className="absolute w-16 h-px bg-gradient-to-r from-red-500/50 to-transparent"
             style={{
               transform: `rotate(${angle}deg)`,
@@ -174,7 +201,6 @@ const SingleAgentView = () => {
 };
 
 const TeamAgentView = () => {
-  // Use pixel positions for precise alignment
   const nodes = [
     { label: "LEAD", x: 50, y: 15 },
     { label: "RSRCH", x: 15, y: 45 },
@@ -184,11 +210,9 @@ const TeamAgentView = () => {
   ];
 
   const connections = [
-    // From LEAD to middle row
     { from: { x: 50, y: 22 }, to: { x: 15, y: 38 } },
     { from: { x: 50, y: 22 }, to: { x: 50, y: 38 } },
     { from: { x: 50, y: 22 }, to: { x: 85, y: 38 } },
-    // From middle row to EXEC
     { from: { x: 15, y: 52 }, to: { x: 50, y: 71 } },
     { from: { x: 50, y: 52 }, to: { x: 50, y: 71 } },
     { from: { x: 85, y: 52 }, to: { x: 50, y: 71 } },
@@ -196,7 +220,15 @@ const TeamAgentView = () => {
 
   return (
     <div className="relative w-full h-full">
-      <div className="absolute inset-0 bg-grid-fine opacity-30" />
+      {/* Layered depth effect - Team side has more depth */}
+      <motion.div 
+        className="absolute inset-0 bg-grid-fine opacity-20"
+        style={{ transform: 'translateZ(-20px)' }}
+      />
+      <motion.div 
+        className="absolute inset-0 bg-grid-fine opacity-40"
+        style={{ transform: 'translateZ(0px)' }}
+      />
       
       {/* Connections SVG */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
@@ -226,7 +258,7 @@ const TeamAgentView = () => {
             filter="url(#glow-team)"
             initial={{ opacity: 0, pathLength: 0 }}
             animate={{ opacity: 0.6, pathLength: 1 }}
-            transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
+            transition={{ duration: 0.5, delay: 0.15 + i * 0.05, ease: "easeOut" }}
           />
         ))}
       </svg>
@@ -235,7 +267,7 @@ const TeamAgentView = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.5, duration: 0.4, ease: "easeOut" }}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
       >
         <div className="relative w-10 h-10">
@@ -258,30 +290,37 @@ const TeamAgentView = () => {
           key={node.label}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.08 + i * 0.06, ease: "easeOut" }}
+          transition={{ delay: 0.08 + i * 0.06, duration: 0.4, ease: "easeOut" }}
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: `${node.x}%`, top: `${node.y}%` }}
         >
           <div className="relative group">
-            <div className="absolute -inset-1 bg-primary/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div 
-              className="relative w-12 h-12 bg-card border border-primary/40 flex items-center justify-center hover:border-primary hover:bg-primary/10 transition-all cursor-pointer"
+            <motion.div 
+              className="absolute -inset-1 bg-primary/10 blur-md opacity-0 group-hover:opacity-100"
+              transition={{ duration: 0.3 }}
+            />
+            <motion.div 
+              className="relative w-12 h-12 bg-card border border-primary/40 flex items-center justify-center cursor-pointer"
+              whileHover={{ 
+                scale: 1.03, 
+                borderColor: 'hsl(var(--primary))',
+                backgroundColor: 'hsl(var(--primary) / 0.1)',
+              }}
+              transition={{ duration: 0.25 }}
               style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.12)' }}
             >
-              {/* Corner accents */}
               <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
               <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
               <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
               <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
               
-              {/* Status dot */}
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
                    style={{ boxShadow: '0 0 6px #4ade80' }} />
               
               <span className="text-[9px] font-mono text-primary uppercase tracking-wider">
                 {node.label}
               </span>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       ))}

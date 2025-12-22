@@ -1,5 +1,5 @@
-import { motion, type Variants } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion, useScroll, useTransform, type Variants } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Terminal, Hexagon } from "lucide-react";
 import { SciFiPanel } from "@/components/ui/scifi-panel";
@@ -8,6 +8,17 @@ const HeroSection = () => {
   const [showWorkflow, setShowWorkflow] = useState(false);
   const [typedText, setTypedText] = useState("");
   const fullText = "Build me a content team that researches, writes, reviews, and posts daily.";
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Parallax setup
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+  
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const canvasScale = useTransform(scrollYProgress, [0, 0.3], [1, 1.02]);
+  const canvasY = useTransform(scrollYProgress, [0, 1], [0, -30]);
 
   useEffect(() => {
     let index = 0;
@@ -27,20 +38,13 @@ const HeroSection = () => {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
     },
   };
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   const bullets = [
@@ -50,24 +54,36 @@ const HeroSection = () => {
   ];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-hero" />
-      <div className="absolute inset-0 bg-grid opacity-40" />
-      <div className="absolute inset-0 bg-hex-grid opacity-30" />
+    <section ref={containerRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background with parallax */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-hero" 
+        style={{ y: bgY }}
+      />
+      <motion.div 
+        className="absolute inset-0 bg-grid opacity-40" 
+        style={{ y: useTransform(scrollYProgress, [0, 1], [0, 100]) }}
+      />
+      <motion.div 
+        className="absolute inset-0 bg-hex-grid opacity-30" 
+        style={{ y: useTransform(scrollYProgress, [0, 1], [0, 80]) }}
+      />
       <div className="absolute inset-0 scanline-overlay" />
       <div className="absolute inset-0 noise-overlay" />
       
-      {/* Glowing orb */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-[150px]" />
+      {/* Glowing orb with subtle movement */}
+      <motion.div 
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-[150px]"
+        style={{ y: useTransform(scrollYProgress, [0, 1], [0, 50]) }}
+      />
       
-      {/* Animated corner decorations */}
-      <div className="absolute top-20 left-10 w-32 h-32 border-l-2 border-t-2 border-primary/20 animate-pulse-glow" />
-      <div className="absolute bottom-20 right-10 w-32 h-32 border-r-2 border-b-2 border-primary/20 animate-pulse-glow" />
+      {/* Corner decorations */}
+      <div className="absolute top-20 left-10 w-32 h-32 border-l-2 border-t-2 border-primary/20" />
+      <div className="absolute bottom-20 right-10 w-32 h-32 border-r-2 border-b-2 border-primary/20" />
       
       <div className="container relative z-10 py-20 lg:py-28">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Content */}
+          {/* Left: Content - No parallax on text */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -92,7 +108,7 @@ const HeroSection = () => {
               <br />
               <span className="text-muted-foreground">Don't Scale.</span>
               <br />
-              <span className="text-primary animate-flicker">Teams Do.</span>
+              <span className="text-primary">Teams Do.</span>
             </motion.h1>
 
             <motion.p
@@ -109,7 +125,7 @@ const HeroSection = () => {
                   key={index}
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
+                  transition={{ delay: 0.6 + index * 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
                   className="flex items-center gap-3 text-muted-foreground text-sm font-mono"
                 >
                   <span className="w-1.5 h-1.5 bg-primary" style={{ boxShadow: '0 0 6px hsl(var(--primary))' }} />
@@ -124,7 +140,7 @@ const HeroSection = () => {
             >
               <Button variant="hero" size="lg" className="group uppercase tracking-wider">
                 <span>Join Waitlist</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
               </Button>
               <Button variant="ghost-border" size="lg" className="uppercase tracking-wider">
                 Learn More
@@ -132,11 +148,12 @@ const HeroSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right: Interactive Demo */}
+          {/* Right: Interactive Demo with parallax depth */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            style={{ scale: canvasScale, y: canvasY }}
             className="relative"
           >
             <SciFiPanel glowing label="Command Interface">
@@ -176,10 +193,15 @@ const HeroSection = () => {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] text-primary/60 font-mono uppercase tracking-widest">› output</span>
                     {showWorkflow && (
-                      <span className="flex items-center gap-1.5 text-[10px] font-mono">
-                        <span className="w-1.5 h-1.5 bg-green-400 animate-pulse" style={{ boxShadow: '0 0 6px #4ade80' }} />
+                      <motion.span 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.4 }}
+                        className="flex items-center gap-1.5 text-[10px] font-mono"
+                      >
+                        <span className="w-1.5 h-1.5 bg-green-400" style={{ boxShadow: '0 0 6px #4ade80' }} />
                         <span className="text-green-400 uppercase">Executing</span>
-                      </span>
+                      </motion.span>
                     )}
                   </div>
 
@@ -188,11 +210,15 @@ const HeroSection = () => {
                       <WorkflowVisualization />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex items-center gap-2 text-primary/60 text-sm font-mono">
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex items-center gap-2 text-primary/60 text-sm font-mono"
+                        >
                           <div className="w-2 h-2 bg-primary animate-pulse" />
                           <span className="uppercase tracking-widest">Processing</span>
                           <span className="animate-pulse">...</span>
-                        </div>
+                        </motion.div>
                       </div>
                     )}
                   </div>
@@ -207,12 +233,14 @@ const HeroSection = () => {
 };
 
 const WorkflowVisualization = () => {
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  
   const nodes = [
-    { id: "input", label: "INPUT", x: 10, y: 50, icon: "→" },
-    { id: "research", label: "RSRCH", x: 80, y: 50 },
-    { id: "write", label: "WRITE", x: 150, y: 50 },
-    { id: "review", label: "REVW", x: 220, y: 50 },
-    { id: "post", label: "POST", x: 290, y: 50 },
+    { id: "input", label: "INPUT", role: "Trigger", x: 10, y: 50, icon: "→" },
+    { id: "research", label: "RSRCH", role: "Researcher", x: 80, y: 50 },
+    { id: "write", label: "WRITE", role: "Writer", x: 150, y: 50 },
+    { id: "review", label: "REVW", role: "QA Reviewer", x: 220, y: 50 },
+    { id: "post", label: "POST", role: "Publisher", x: 290, y: 50 },
   ];
 
   const connections = [
@@ -222,9 +250,16 @@ const WorkflowVisualization = () => {
     { from: 3, to: 4 },
   ];
 
+  const getConnectionOpacity = (fromIdx: number, toIdx: number) => {
+    if (!hoveredNode) return 0.5;
+    const fromNode = nodes[fromIdx];
+    const toNode = nodes[toIdx];
+    if (fromNode.id === hoveredNode || toNode.id === hoveredNode) return 0.9;
+    return 0.2;
+  };
+
   return (
     <div className="relative w-full h-[140px]">
-      {/* Grid background */}
       <div className="absolute inset-0 bg-grid-fine opacity-40" />
       
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 360 140" preserveAspectRatio="xMidYMid meet">
@@ -241,17 +276,16 @@ const WorkflowVisualization = () => {
           </marker>
         </defs>
 
-        {/* Connection lines */}
         {connections.map((conn, i) => {
           const from = nodes[conn.from];
           const to = nodes[conn.to];
           const fromX = from.x + 28;
           const toX = to.x + 2;
           const y = 70;
+          const opacity = getConnectionOpacity(conn.from, conn.to);
           
           return (
             <g key={i}>
-              {/* Glow line */}
               <motion.line
                 x1={fromX}
                 y1={y}
@@ -259,13 +293,11 @@ const WorkflowVisualization = () => {
                 y2={y}
                 stroke="hsl(var(--primary))"
                 strokeWidth="1"
-                strokeOpacity="0.3"
                 filter="url(#glow-line)"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: opacity * 0.4 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               />
-              {/* Main line */}
               <motion.line
                 x1={fromX}
                 y1={y}
@@ -275,23 +307,22 @@ const WorkflowVisualization = () => {
                 strokeWidth="1.5"
                 markerEnd="url(#arrowhead)"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.3 }}
+                animate={{ opacity }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
               />
-              {/* Animated dot */}
               <motion.circle
                 cx={fromX}
                 cy={y}
                 r="2"
                 fill="hsl(var(--primary))"
-                initial={{ cx: fromX }}
-                animate={{ cx: toX }}
+                initial={{ cx: fromX, opacity: 0 }}
+                animate={{ cx: toX, opacity: 0.8 }}
                 transition={{ 
                   delay: 0.8 + i * 0.15, 
-                  duration: 0.6, 
+                  duration: 0.8, 
                   repeat: Infinity, 
-                  repeatDelay: 2,
-                  ease: "easeInOut"
+                  repeatDelay: 2.5,
+                  ease: [0.25, 0.1, 0.25, 1]
                 }}
               />
             </g>
@@ -299,49 +330,71 @@ const WorkflowVisualization = () => {
         })}
       </svg>
 
-      {/* Nodes */}
-      {nodes.map((node, i) => (
-        <motion.div
-          key={node.id}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: i * 0.08, duration: 0.3, ease: "easeOut" }}
-          className="absolute"
-          style={{ left: node.x, top: node.y }}
-        >
-          <div className="relative group">
-            {/* Outer glow */}
-            <div className="absolute -inset-1 bg-primary/15 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            {/* Node box */}
-            <div 
-              className="relative w-[30px] h-[30px] bg-card border border-primary/50 flex items-center justify-center hover:border-primary hover:bg-primary/10 transition-all cursor-pointer"
-              style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.15)' }}
-            >
-              {/* Corner accents */}
-              <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
-              <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
-              <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
-              <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
+      {nodes.map((node, i) => {
+        const isHovered = hoveredNode === node.id;
+        const isDimmed = hoveredNode && !isHovered;
+        
+        return (
+          <motion.div
+            key={node.id}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ 
+              scale: isHovered ? 1.04 : 1, 
+              opacity: isDimmed ? 0.4 : 1 
+            }}
+            transition={{ delay: i * 0.08, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            className="absolute"
+            style={{ left: node.x, top: node.y }}
+            onMouseEnter={() => setHoveredNode(node.id)}
+            onMouseLeave={() => setHoveredNode(null)}
+          >
+            <div className="relative group cursor-pointer">
+              <motion.div 
+                className="absolute -inset-1 bg-primary/15 blur-md"
+                animate={{ opacity: isHovered ? 1 : 0 }}
+                transition={{ duration: 0.3 }}
+              />
               
-              {/* Status indicator */}
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
-                   style={{ boxShadow: '0 0 6px #4ade80' }} />
+              <motion.div 
+                className="relative w-[30px] h-[30px] bg-card border border-primary/50 flex items-center justify-center transition-colors duration-300"
+                animate={{ 
+                  borderColor: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--primary) / 0.5)',
+                  backgroundColor: isHovered ? 'hsl(var(--primary) / 0.15)' : 'hsl(var(--card))'
+                }}
+                style={{ boxShadow: isHovered ? '0 0 20px hsl(var(--primary) / 0.3)' : '0 0 12px hsl(var(--primary) / 0.15)' }}
+              >
+                <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
+                <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
+                <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
+                <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
+                
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
+                     style={{ boxShadow: '0 0 6px #4ade80' }} />
+                
+                {node.icon ? (
+                  <span className="text-xs text-primary">{node.icon}</span>
+                ) : (
+                  <div className="w-2.5 h-2.5 bg-primary/40 border border-primary/60" />
+                )}
+              </motion.div>
               
-              {node.icon ? (
-                <span className="text-xs text-primary">{node.icon}</span>
-              ) : (
-                <div className="w-2.5 h-2.5 bg-primary/40 border border-primary/60" />
-              )}
+              <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/70 uppercase tracking-wider whitespace-nowrap">
+                {node.label}
+              </span>
+              
+              {/* Tooltip on hover */}
+              <motion.div
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 4 }}
+                transition={{ duration: 0.2 }}
+                className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-card border border-primary/40 whitespace-nowrap pointer-events-none"
+              >
+                <span className="text-[9px] font-mono text-primary">{node.role}</span>
+              </motion.div>
             </div>
-            
-            {/* Label */}
-            <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/70 uppercase tracking-wider whitespace-nowrap">
-              {node.label}
-            </span>
-          </div>
-        </motion.div>
-      ))}
+          </motion.div>
+        );
+      })}
     </div>
   );
 };
