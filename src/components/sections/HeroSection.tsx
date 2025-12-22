@@ -235,22 +235,23 @@ const HeroSection = () => {
 const WorkflowVisualization = () => {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   
-  // Hierarchical org structure: Orchestrator at top, managers, then workers
+  // Hierarchical org structure using percentages for responsive layout
+  // x and y are percentages (0-100) of the container
   const nodes = [
     // Top level - Orchestrator
-    { id: "orchestrator", label: "ORCH", role: "Orchestrator", x: 155, y: 8, tier: "leader", icon: "◈" },
+    { id: "orchestrator", label: "ORCH", role: "Orchestrator", x: 50, y: 5, tier: "leader", icon: "◈" },
     
     // Middle level - Managers
-    { id: "research-mgr", label: "R-MGR", role: "Research Lead", x: 70, y: 55, tier: "manager" },
-    { id: "content-mgr", label: "C-MGR", role: "Content Lead", x: 240, y: 55, tier: "manager" },
+    { id: "research-mgr", label: "R-MGR", role: "Research Lead", x: 25, y: 35, tier: "manager" },
+    { id: "content-mgr", label: "C-MGR", role: "Content Lead", x: 75, y: 35, tier: "manager" },
     
     // Bottom level - Workers
-    { id: "web-scraper", label: "SCRP", role: "Web Scraper", x: 15, y: 105, tier: "worker" },
-    { id: "analyst", label: "ANLY", role: "Data Analyst", x: 70, y: 105, tier: "worker" },
-    { id: "fact-check", label: "FACT", role: "Fact Checker", x: 125, y: 105, tier: "worker" },
-    { id: "writer", label: "WRIT", role: "Writer", x: 195, y: 105, tier: "worker" },
-    { id: "editor", label: "EDIT", role: "Editor", x: 250, y: 105, tier: "worker" },
-    { id: "publisher", label: "PUB", role: "Publisher", x: 305, y: 105, tier: "worker" },
+    { id: "web-scraper", label: "SCRP", role: "Web Scraper", x: 8, y: 70, tier: "worker" },
+    { id: "analyst", label: "ANLY", role: "Data Analyst", x: 25, y: 70, tier: "worker" },
+    { id: "fact-check", label: "FACT", role: "Fact Checker", x: 42, y: 70, tier: "worker" },
+    { id: "writer", label: "WRIT", role: "Writer", x: 58, y: 70, tier: "worker" },
+    { id: "editor", label: "EDIT", role: "Editor", x: 75, y: 70, tier: "worker" },
+    { id: "publisher", label: "PUB", role: "Publisher", x: 92, y: 70, tier: "worker" },
   ];
 
   // Connections showing hierarchy and cross-team communication
@@ -291,12 +292,13 @@ const WorkflowVisualization = () => {
     }
   };
 
-  const getNodeSize = (tier: string) => {
+  // Node sizes as percentages of container width for responsiveness
+  const getNodeSizePercent = (tier: string) => {
     switch (tier) {
-      case "leader": return 36;
-      case "manager": return 30;
-      case "worker": return 26;
-      default: return 26;
+      case "leader": return { w: 10, h: 22 };
+      case "manager": return { w: 8.5, h: 19 };
+      case "worker": return { w: 7.5, h: 16 };
+      default: return { w: 7.5, h: 16 };
     }
   };
 
@@ -304,7 +306,8 @@ const WorkflowVisualization = () => {
     <div className="relative w-full h-[160px]">
       <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 360 160" preserveAspectRatio="xMidYMid meet">
+      {/* SVG for connections - uses viewBox for perfect scaling */}
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <filter id="glow-line-hero" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -326,11 +329,12 @@ const WorkflowVisualization = () => {
           const to = getNodeById(conn.to);
           if (!from || !to) return null;
 
-          const fromSize = getNodeSize(from.tier);
-          const toSize = getNodeSize(to.tier);
-          const fromX = from.x + fromSize / 2;
-          const fromY = from.y + fromSize;
-          const toX = to.x + toSize / 2;
+          const fromSize = getNodeSizePercent(from.tier);
+          const toSize = getNodeSizePercent(to.tier);
+          // Calculate center points using percentages
+          const fromX = from.x;
+          const fromY = from.y + fromSize.h / 2 + 8;
+          const toX = to.x;
           const toY = to.y;
           
           const opacity = getConnectionOpacity(conn.from, conn.to);
@@ -338,10 +342,10 @@ const WorkflowVisualization = () => {
           const strokeColor = isDataFlow ? "hsl(160 100% 45%)" : "hsl(var(--primary))";
           const markerId = isDataFlow ? "arrow-data" : "arrow-command";
           
-          // Create curved paths for hierarchy, straight dashed for data flow
+          // Create curved paths using percentage coordinates
           const midY = (fromY + toY) / 2;
           const path = isDataFlow 
-            ? `M ${fromX} ${fromY - 5} L ${toX} ${toY + 5}`
+            ? `M ${fromX} ${fromY - 3} L ${toX} ${toY + 3}`
             : `M ${fromX} ${fromY} Q ${fromX} ${midY} ${(fromX + toX) / 2} ${midY} Q ${toX} ${midY} ${toX} ${toY}`;
           
           return (
@@ -349,18 +353,19 @@ const WorkflowVisualization = () => {
               <motion.path
                 d={path}
                 stroke={strokeColor}
-                strokeWidth={isDataFlow ? 1 : 1.5}
-                strokeDasharray={isDataFlow ? "4 3" : "none"}
+                strokeWidth={0.4}
+                strokeDasharray={isDataFlow ? "1 0.8" : "none"}
                 fill="none"
                 filter="url(#glow-line-hero)"
                 markerEnd={`url(#${markerId})`}
+                vectorEffect="non-scaling-stroke"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: opacity * 0.7 }}
                 transition={{ delay: 0.2 + i * 0.05, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               />
               {/* Animated data particle */}
               <motion.circle
-                r="2"
+                r="0.8"
                 fill={strokeColor}
                 initial={{ opacity: 0 }}
                 animate={{
@@ -384,7 +389,7 @@ const WorkflowVisualization = () => {
       {nodes.map((node, i) => {
         const isHovered = hoveredNode === node.id;
         const isDimmed = hoveredNode && !isHovered;
-        const size = getNodeSize(node.tier);
+        const sizePercent = getNodeSizePercent(node.tier);
         const tierColor = getTierColor(node.tier);
         
         return (
@@ -397,7 +402,14 @@ const WorkflowVisualization = () => {
             }}
             transition={{ delay: i * 0.04, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             className="absolute"
-            style={{ left: node.x, top: node.y }}
+            style={{ 
+              left: `${node.x}%`, 
+              top: `${node.y}%`,
+              transform: 'translate(-50%, 0)',
+              width: `${sizePercent.w}%`,
+              minWidth: '24px',
+              maxWidth: '40px',
+            }}
             onMouseEnter={() => setHoveredNode(node.id)}
             onMouseLeave={() => setHoveredNode(null)}
           >
@@ -410,10 +422,8 @@ const WorkflowVisualization = () => {
               />
               
               <motion.div 
-                className="relative flex items-center justify-center transition-colors duration-300"
-                style={{ 
-                  width: size, 
-                  height: size,
+                className="relative flex items-center justify-center transition-colors duration-300 aspect-square"
+                style={{
                   backgroundColor: isHovered ? `${tierColor}20` : 'hsl(var(--card))',
                   border: `1px solid ${tierColor}`,
                   boxShadow: isHovered 
@@ -436,15 +446,9 @@ const WorkflowVisualization = () => {
                 {node.icon ? (
                   <span className="text-sm" style={{ color: tierColor }}>{node.icon}</span>
                 ) : (
-                  <div 
-                    className="border" 
-                    style={{ 
-                      width: size * 0.35, 
-                      height: size * 0.35, 
-                      backgroundColor: `${tierColor}40`,
-                      borderColor: `${tierColor}80`
-                    }} 
-                  />
+                  <span className="text-[6px] sm:text-[8px] font-mono font-medium tracking-wide" style={{ color: tierColor }}>
+                    {node.label}
+                  </span>
                 )}
               </motion.div>
               
