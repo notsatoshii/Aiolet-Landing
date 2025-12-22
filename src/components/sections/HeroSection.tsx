@@ -233,239 +233,210 @@ const HeroSection = () => {
 };
 
 const WorkflowVisualization = () => {
-  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  
-  // Hierarchical org structure using percentages for responsive layout
-  // x and y are percentages (0-100) of the container
-  const nodes = [
-    // Top level - Orchestrator
-    { id: "orchestrator", label: "ORCH", role: "Orchestrator", x: 50, y: 5, tier: "leader", icon: "◈" },
-    
-    // Middle level - Managers
-    { id: "research-mgr", label: "R-MGR", role: "Research Lead", x: 25, y: 35, tier: "manager" },
-    { id: "content-mgr", label: "C-MGR", role: "Content Lead", x: 75, y: 35, tier: "manager" },
-    
-    // Bottom level - Workers
-    { id: "web-scraper", label: "SCRP", role: "Web Scraper", x: 8, y: 70, tier: "worker" },
-    { id: "analyst", label: "ANLY", role: "Data Analyst", x: 25, y: 70, tier: "worker" },
-    { id: "fact-check", label: "FACT", role: "Fact Checker", x: 42, y: 70, tier: "worker" },
-    { id: "writer", label: "WRIT", role: "Writer", x: 58, y: 70, tier: "worker" },
-    { id: "editor", label: "EDIT", role: "Editor", x: 75, y: 70, tier: "worker" },
-    { id: "publisher", label: "PUB", role: "Publisher", x: 92, y: 70, tier: "worker" },
-  ];
-
-  // Connections showing hierarchy and cross-team communication
-  const connections = [
-    // Orchestrator to managers
-    { from: "orchestrator", to: "research-mgr", type: "command" },
-    { from: "orchestrator", to: "content-mgr", type: "command" },
-    
-    // Research manager to workers
-    { from: "research-mgr", to: "web-scraper", type: "delegate" },
-    { from: "research-mgr", to: "analyst", type: "delegate" },
-    { from: "research-mgr", to: "fact-check", type: "delegate" },
-    
-    // Content manager to workers
-    { from: "content-mgr", to: "writer", type: "delegate" },
-    { from: "content-mgr", to: "editor", type: "delegate" },
-    { from: "content-mgr", to: "publisher", type: "delegate" },
-    
-    // Cross-team data flow
-    { from: "analyst", to: "writer", type: "data" },
-    { from: "fact-check", to: "editor", type: "data" },
-  ];
-
-  const getNodeById = (id: string) => nodes.find(n => n.id === id);
-
-  const getConnectionOpacity = (fromId: string, toId: string) => {
-    if (!hoveredNode) return 0.5;
-    if (fromId === hoveredNode || toId === hoveredNode) return 1;
-    return 0.15;
-  };
-
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case "leader": return "hsl(45 100% 60%)"; // Gold
-      case "manager": return "hsl(var(--primary))";
-      case "worker": return "hsl(var(--primary) / 0.7)";
-      default: return "hsl(var(--primary))";
-    }
-  };
-
-  // Node sizes as percentages of container width for responsiveness
-  const getNodeSizePercent = (tier: string) => {
-    switch (tier) {
-      case "leader": return { w: 10, h: 22 };
-      case "manager": return { w: 8.5, h: 19 };
-      case "worker": return { w: 7.5, h: 16 };
-      default: return { w: 7.5, h: 16 };
-    }
-  };
-
   return (
     <div className="relative w-full h-[160px]">
       <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
-      {/* SVG for connections - uses viewBox for perfect scaling */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <filter id="glow-line-hero" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        {connections.map((conn, i) => {
-          const from = getNodeById(conn.from);
-          const to = getNodeById(conn.to);
-          if (!from || !to) return null;
-
-          const fromSize = getNodeSizePercent(from.tier);
-          const toSize = getNodeSizePercent(to.tier);
-          // Calculate center points using percentages
-          const fromX = from.x;
-          const fromY = from.y + fromSize.h / 2 + 8;
-          const toX = to.x;
-          const toY = to.y;
-          
-          const opacity = getConnectionOpacity(conn.from, conn.to);
-          const isDataFlow = conn.type === "data";
-          const strokeColor = isDataFlow ? "hsl(160 100% 45%)" : "hsl(var(--primary))";
-          
-          // Create curved paths using percentage coordinates
-          const midY = (fromY + toY) / 2;
-          const path = isDataFlow 
-            ? `M ${fromX} ${fromY - 3} L ${toX} ${toY + 3}`
-            : `M ${fromX} ${fromY} Q ${fromX} ${midY} ${(fromX + toX) / 2} ${midY} Q ${toX} ${midY} ${toX} ${toY}`;
-          
-          return (
-            <g key={i}>
-              <motion.path
-                d={path}
-                stroke={strokeColor}
-                strokeWidth={1}
-                strokeDasharray={isDataFlow ? "3 2" : "none"}
-                fill="none"
-                filter="url(#glow-line-hero)"
-                strokeLinecap="round"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: opacity * 0.7 }}
-                transition={{ delay: 0.2 + i * 0.05, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-              />
-              {/* Animated data particle */}
-              <motion.circle
-                r="1.5"
-                fill={strokeColor}
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: [0, 0.9, 0],
-                  offsetDistance: ["0%", "100%"],
-                }}
-                transition={{
-                  delay: 1 + i * 0.1,
-                  duration: 1.2,
-                  repeat: Infinity,
-                  repeatDelay: 3,
-                  ease: [0.25, 0.1, 0.25, 1],
-                }}
-                style={{ offsetPath: `path("${path}")` }}
-              />
-            </g>
-          );
-        })}
-      </svg>
-
-      {nodes.map((node, i) => {
-        const isHovered = hoveredNode === node.id;
-        const isDimmed = hoveredNode && !isHovered;
-        const sizePercent = getNodeSizePercent(node.tier);
-        const tierColor = getTierColor(node.tier);
+      {/* Clean hierarchical layout using flexbox */}
+      <div className="relative w-full h-full flex flex-col items-center justify-between py-2">
         
-        return (
-          <motion.div
-            key={node.id}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ 
-              scale: isHovered ? 1.06 : 1, 
-              opacity: isDimmed ? 0.35 : 1 
-            }}
-            transition={{ delay: i * 0.04, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute"
-            style={{ 
-              left: `${node.x}%`, 
-              top: `${node.y}%`,
-              transform: 'translate(-50%, 0)',
-              width: `${sizePercent.w}%`,
-              minWidth: '24px',
-              maxWidth: '40px',
-            }}
-            onMouseEnter={() => setHoveredNode(node.id)}
-            onMouseLeave={() => setHoveredNode(null)}
-          >
-            <div className="relative group cursor-pointer">
-              <motion.div 
-                className="absolute -inset-1.5 blur-md"
-                style={{ backgroundColor: tierColor }}
-                animate={{ opacity: isHovered ? 0.25 : 0 }}
-                transition={{ duration: 0.3 }}
-              />
-              
-              <motion.div 
-                className="relative flex items-center justify-center transition-colors duration-300 aspect-square"
-                style={{
-                  backgroundColor: isHovered ? `${tierColor}20` : 'hsl(var(--card))',
-                  border: `1px solid ${tierColor}`,
-                  boxShadow: isHovered 
-                    ? `0 0 20px ${tierColor}50` 
-                    : `0 0 8px ${tierColor}25`
-                }}
-              >
-                {/* Corner accents */}
-                <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t" style={{ borderColor: tierColor }} />
-                <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t" style={{ borderColor: tierColor }} />
-                <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b" style={{ borderColor: tierColor }} />
-                <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b" style={{ borderColor: tierColor }} />
-                
-                {/* Status indicator */}
-                <div 
-                  className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background" 
-                  style={{ boxShadow: '0 0 4px #4ade80' }} 
-                />
-                
-                {node.icon ? (
-                  <span className="text-sm" style={{ color: tierColor }}>{node.icon}</span>
-                ) : (
-                  <span className="text-[6px] sm:text-[8px] font-mono font-medium tracking-wide" style={{ color: tierColor }}>
-                    {node.label}
-                  </span>
-                )}
-              </motion.div>
-              
-              <span 
-                className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-mono uppercase tracking-wider whitespace-nowrap"
-                style={{ color: `${tierColor}90` }}
-              >
-                {node.label}
-              </span>
-              
-              {/* Tooltip on hover */}
-              <motion.div
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 4 }}
-                transition={{ duration: 0.2 }}
-                className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 bg-card border whitespace-nowrap pointer-events-none z-10"
-                style={{ borderColor: `${tierColor}60` }}
-              >
-                <span className="text-[9px] font-mono" style={{ color: tierColor }}>{node.role}</span>
-              </motion.div>
-            </div>
-          </motion.div>
-        );
-      })}
+        {/* Row 1: Orchestrator */}
+        <div className="flex justify-center w-full">
+          <WorkflowNode label="ORCH" role="Orchestrator" tier="leader" icon="◈" />
+        </div>
+
+        {/* Vertical lines from Orchestrator to Managers */}
+        <div className="relative w-full h-6 flex justify-center">
+          <svg className="absolute inset-0 w-full h-full overflow-visible">
+            {/* Center vertical line down */}
+            <motion.line 
+              x1="50%" y1="0" x2="50%" y2="50%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            />
+            {/* Horizontal line connecting to managers */}
+            <motion.line 
+              x1="25%" y1="50%" x2="75%" y2="50%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            />
+            {/* Left vertical to research mgr */}
+            <motion.line 
+              x1="25%" y1="50%" x2="25%" y2="100%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+            />
+            {/* Right vertical to content mgr */}
+            <motion.line 
+              x1="75%" y1="50%" x2="75%" y2="100%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.5"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+            />
+          </svg>
+        </div>
+
+        {/* Row 2: Managers */}
+        <div className="flex justify-between w-full px-4 sm:px-8">
+          <div className="flex-1 flex justify-center">
+            <WorkflowNode label="R-MGR" role="Research Lead" tier="manager" />
+          </div>
+          <div className="flex-1 flex justify-center">
+            <WorkflowNode label="C-MGR" role="Content Lead" tier="manager" />
+          </div>
+        </div>
+
+        {/* Vertical lines from Managers to Workers */}
+        <div className="relative w-full h-6 flex justify-center">
+          <svg className="absolute inset-0 w-full h-full overflow-visible">
+            {/* Left side: Research team connections */}
+            <motion.line 
+              x1="25%" y1="0" x2="25%" y2="50%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
+            />
+            <motion.line 
+              x1="10%" y1="50%" x2="40%" y2="50%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.4, delay: 0.55 }}
+            />
+            <motion.line x1="10%" y1="50%" x2="10%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
+            <motion.line x1="25%" y1="50%" x2="25%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
+            <motion.line x1="40%" y1="50%" x2="40%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
+            
+            {/* Right side: Content team connections */}
+            <motion.line 
+              x1="75%" y1="0" x2="75%" y2="50%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
+            />
+            <motion.line 
+              x1="60%" y1="50%" x2="90%" y2="50%"
+              stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.4, delay: 0.55 }}
+            />
+            <motion.line x1="60%" y1="50%" x2="60%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
+            <motion.line x1="75%" y1="50%" x2="75%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
+            <motion.line x1="90%" y1="50%" x2="90%" y2="100%" stroke="hsl(var(--primary))" strokeWidth="1" strokeOpacity="0.4" />
+          </svg>
+        </div>
+
+        {/* Row 3: Workers */}
+        <div className="flex justify-between w-full gap-1">
+          <WorkflowNode label="SCRP" role="Scraper" tier="worker" />
+          <WorkflowNode label="ANLY" role="Analyst" tier="worker" />
+          <WorkflowNode label="FACT" role="Fact Check" tier="worker" />
+          <WorkflowNode label="WRIT" role="Writer" tier="worker" />
+          <WorkflowNode label="EDIT" role="Editor" tier="worker" />
+          <WorkflowNode label="PUB" role="Publisher" tier="worker" />
+        </div>
+
+        {/* Data flow line between teams (Analyst → Writer) */}
+        <motion.div 
+          className="absolute top-[68%] left-[28%] w-[22%] h-px"
+          style={{ 
+            background: 'linear-gradient(90deg, hsl(160 100% 45% / 0.6), hsl(160 100% 45% / 0.3))',
+          }}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        />
+      </div>
     </div>
+  );
+};
+
+const WorkflowNode = ({ 
+  label, 
+  role, 
+  tier, 
+  icon 
+}: { 
+  label: string; 
+  role: string; 
+  tier: 'leader' | 'manager' | 'worker';
+  icon?: string;
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const tierColor = {
+    leader: "hsl(45 100% 60%)",
+    manager: "hsl(var(--primary))",
+    worker: "hsl(var(--primary) / 0.8)"
+  }[tier];
+  
+  const sizeClass = {
+    leader: "w-8 h-8 sm:w-10 sm:h-10",
+    manager: "w-6 h-6 sm:w-8 sm:h-8",
+    worker: "w-5 h-5 sm:w-6 sm:h-6"
+  }[tier];
+
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="relative group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <motion.div
+        animate={{ scale: isHovered ? 1.1 : 1 }}
+        className={`relative ${sizeClass} flex items-center justify-center cursor-pointer`}
+        style={{
+          backgroundColor: isHovered ? `${tierColor}20` : 'hsl(var(--card))',
+          border: `1px solid ${tierColor}`,
+          boxShadow: isHovered ? `0 0 12px ${tierColor}50` : `0 0 4px ${tierColor}20`
+        }}
+      >
+        {/* Corner accents */}
+        <div className="absolute -top-px -left-px w-1 h-1 border-l border-t" style={{ borderColor: tierColor }} />
+        <div className="absolute -top-px -right-px w-1 h-1 border-r border-t" style={{ borderColor: tierColor }} />
+        <div className="absolute -bottom-px -left-px w-1 h-1 border-l border-b" style={{ borderColor: tierColor }} />
+        <div className="absolute -bottom-px -right-px w-1 h-1 border-r border-b" style={{ borderColor: tierColor }} />
+        
+        {/* Status indicator */}
+        <div 
+          className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-green-400" 
+          style={{ boxShadow: '0 0 3px #4ade80' }} 
+        />
+        
+        {icon ? (
+          <span className="text-[10px] sm:text-xs" style={{ color: tierColor }}>{icon}</span>
+        ) : (
+          <span className="text-[5px] sm:text-[7px] font-mono font-medium" style={{ color: tierColor }}>
+            {label}
+          </span>
+        )}
+      </motion.div>
+      
+      {/* Label below */}
+      <span 
+        className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[5px] sm:text-[6px] font-mono uppercase tracking-wider whitespace-nowrap"
+        style={{ color: `${tierColor}` }}
+      >
+        {label}
+      </span>
+      
+      {/* Tooltip on hover */}
+      {isHovered && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-card border whitespace-nowrap pointer-events-none z-10"
+          style={{ borderColor: `${tierColor}60` }}
+        >
+          <span className="text-[8px] font-mono" style={{ color: tierColor }}>{role}</span>
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
