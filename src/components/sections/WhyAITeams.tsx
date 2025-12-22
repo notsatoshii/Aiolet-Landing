@@ -1,5 +1,5 @@
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
 import { SciFiPanel } from "@/components/ui/scifi-panel";
 
 const WhyAITeams = () => {
@@ -7,7 +7,6 @@ const WhyAITeams = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [activeView, setActiveView] = useState<"single" | "team">("single");
 
-  // Parallax for depth effect
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -16,7 +15,7 @@ const WhyAITeams = () => {
   const bgY = useTransform(scrollYProgress, [0, 1], [30, -30]);
 
   return (
-    <section ref={ref} className="relative py-24 lg:py-28 overflow-hidden">
+    <section ref={ref} className="relative py-24 lg:py-32 overflow-hidden">
       <motion.div 
         className="absolute inset-0 bg-gradient-to-b from-background via-primary/3 to-background" 
         style={{ y: bgY }}
@@ -28,7 +27,7 @@ const WhyAITeams = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-primary/10 border border-primary/30 text-primary text-[10px] font-mono uppercase tracking-widest mb-6">
             <span className="w-1 h-1 bg-primary" />
@@ -50,28 +49,28 @@ const WhyAITeams = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex justify-center mb-10"
+          className="flex justify-center mb-8"
         >
-          <div className="inline-flex bg-card border border-primary/30">
+          <div className="inline-flex bg-card border-2 border-primary/40 shadow-lg shadow-primary/10">
             <button
               onClick={() => setActiveView("single")}
-              className={`px-5 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 ${
+              className={`px-6 py-3 text-xs font-mono uppercase tracking-widest transition-all duration-300 ${
                 activeView === "single"
-                  ? "bg-primary/20 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-red-500/20 text-red-400 border-r border-red-500/30"
+                  : "text-muted-foreground hover:text-foreground border-r border-primary/20"
               }`}
             >
-              Single Agent
+              ⚠ Single Agent
             </button>
             <button
               onClick={() => setActiveView("team")}
-              className={`px-5 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 ${
+              className={`px-6 py-3 text-xs font-mono uppercase tracking-widest transition-all duration-300 ${
                 activeView === "team"
-                  ? "bg-primary/20 text-primary"
+                  ? "bg-green-500/20 text-green-400"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              AI Team
+              ✓ AI Team
             </button>
           </div>
         </motion.div>
@@ -81,51 +80,674 @@ const WhyAITeams = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative max-w-3xl mx-auto"
+          className="relative max-w-4xl mx-auto"
         >
-          <SciFiPanel label={activeView === "single" ? "Single Agent Mode" : "Team Mode"}>
-            <div className="p-6 md:p-10">
-              <div className="relative h-[280px] md:h-[320px]">
-                <motion.div
-                  key={activeView}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  {activeView === "single" ? <SingleAgentView /> : <TeamAgentView />}
-                </motion.div>
+          <SciFiPanel label={activeView === "single" ? "Single Agent Mode — Bottleneck" : "Team Mode — Parallel Execution"}>
+            <div className="p-6 md:p-8">
+              <div className="relative h-[420px] md:h-[480px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeView}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="absolute inset-0"
+                  >
+                    {activeView === "single" ? <SingleAgentView /> : <TeamAgentView />}
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
-              {/* Status Labels */}
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <motion.div
-                  key={`labels-${activeView}`}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 }}
-                  className="flex flex-wrap justify-center gap-3"
-                >
-                  {activeView === "single" ? (
-                    <>
-                      <StatusLabel label="Bottlenecks" variant="error" />
-                      <StatusLabel label="Fragile" variant="error" />
-                      <StatusLabel label="Limited" variant="error" />
-                    </>
-                  ) : (
-                    <>
-                      <StatusLabel label="Parallel" variant="success" />
-                      <StatusLabel label="Structured" variant="success" />
-                      <StatusLabel label="Reliable" variant="success" />
-                    </>
-                  )}
-                </motion.div>
-              </div>
+              {/* Legend */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mt-6 flex flex-wrap justify-center gap-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground"
+              >
+                {activeView === "team" ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-sm border-2 border-yellow-400 bg-yellow-400/20" />
+                      <span>Orchestrator</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-sm border-2 border-primary bg-primary/20" />
+                      <span>Leads</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-sm border-2 border-cyan-400 bg-cyan-400/20" />
+                      <span>Workers</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-px bg-primary" />
+                      <span>Command</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-px bg-green-400" style={{ backgroundImage: 'repeating-linear-gradient(90deg, hsl(142 76% 56%), hsl(142 76% 56%) 4px, transparent 4px, transparent 8px)' }} />
+                      <span>Data Flow</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-sm border-2 border-red-500 bg-red-500/20" />
+                      <span>Overloaded Agent</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-sm bg-red-500/80" />
+                      <span>Failed Task</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-sm bg-yellow-500/80" />
+                      <span>Timeout</span>
+                    </div>
+                  </>
+                )}
+              </motion.div>
             </div>
           </SciFiPanel>
         </motion.div>
       </div>
     </section>
+  );
+};
+
+// ============ SINGLE AGENT VIEW ============
+const SingleAgentView = () => {
+  const [tasksState, setTasksState] = useState<Array<{ id: number; status: 'pending' | 'processing' | 'failed' | 'timeout' | 'complete' }>>([]);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [failedCount, setFailedCount] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    // Initialize 10 tasks
+    const initialTasks = Array.from({ length: 10 }, (_, i) => ({
+      id: i,
+      status: 'pending' as const
+    }));
+    setTasksState(initialTasks);
+    setCompletedCount(0);
+    setFailedCount(0);
+    setProgress(0);
+
+    // Simulate processing with failures
+    const results = [
+      { delay: 800, result: 'complete' },
+      { delay: 1500, result: 'complete' },
+      { delay: 2200, result: 'failed' },
+      { delay: 2900, result: 'complete' },
+      { delay: 3500, result: 'timeout' },
+      { delay: 4200, result: 'failed' },
+      { delay: 4800, result: 'timeout' },
+      { delay: 5400, result: 'failed' },
+      { delay: 6000, result: 'timeout' },
+      { delay: 6500, result: 'failed' },
+    ];
+
+    const timeouts: NodeJS.Timeout[] = [];
+
+    results.forEach((r, i) => {
+      // Start processing
+      const processingTimeout = setTimeout(() => {
+        setTasksState(prev => prev.map((t, idx) => 
+          idx === i ? { ...t, status: 'processing' } : t
+        ));
+      }, r.delay - 400);
+      timeouts.push(processingTimeout);
+
+      // Complete/fail
+      const resultTimeout = setTimeout(() => {
+        setTasksState(prev => prev.map((t, idx) => 
+          idx === i ? { ...t, status: r.result as 'complete' | 'failed' | 'timeout' } : t
+        ));
+        if (r.result === 'complete') {
+          setCompletedCount(prev => prev + 1);
+          setProgress(prev => Math.min(prev + 10, 30));
+        } else {
+          setFailedCount(prev => prev + 1);
+        }
+      }, r.delay);
+      timeouts.push(resultTimeout);
+    });
+
+    return () => timeouts.forEach(t => clearTimeout(t));
+  }, []);
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Grid background */}
+      <div className="absolute inset-0 bg-grid-fine opacity-20" />
+      
+      {/* Metrics Panel */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        className="absolute top-0 left-0 bg-card/80 border border-red-500/30 p-4"
+      >
+        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Performance</div>
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-mono text-red-400">{completedCount}</span>
+          <span className="text-lg font-mono text-muted-foreground">/10</span>
+        </div>
+        <div className="text-[10px] font-mono text-red-400 mt-1">
+          {failedCount} FAILED
+        </div>
+        
+        {/* Stalling progress bar */}
+        <div className="mt-3 w-32 h-1.5 bg-muted/30 border border-red-500/20">
+          <motion.div 
+            className="h-full bg-red-500"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+        <div className="text-[9px] font-mono text-red-400/70 mt-1">STALLED</div>
+      </motion.div>
+
+      {/* Central Agent */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative"
+        >
+          {/* Stress glow */}
+          <motion.div 
+            className="absolute -inset-8 bg-red-500/30 blur-2xl rounded-full"
+            animate={{ 
+              opacity: [0.3, 0.6, 0.3],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          
+          {/* Agent box */}
+          <div className="relative w-28 h-28 bg-card border-2 border-red-500 flex flex-col items-center justify-center">
+            <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-red-500" />
+            <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-red-500" />
+            <div className="absolute -bottom-1 -left-1 w-4 h-4 border-l-2 border-b-2 border-red-500" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 border-r-2 border-b-2 border-red-500" />
+            
+            <motion.div
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+              className="text-xs font-mono text-red-400 uppercase tracking-widest"
+            >
+              AGENT
+            </motion.div>
+            <div className="text-[10px] font-mono text-red-500/70 mt-1">OVERLOADED</div>
+            
+            {/* Stress indicator */}
+            <motion.div 
+              className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-red-500/20 border border-red-500/50"
+              animate={{ opacity: [1, 0.6, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity }}
+            >
+              <span className="text-[8px] font-mono text-red-400">CPU 100%</span>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Task Queue (left side) */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2 }}
+        className="absolute left-8 top-1/2 -translate-y-1/2"
+      >
+        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-3">
+          Task Queue
+        </div>
+        <div className="flex flex-col gap-1.5">
+          {tasksState.slice(0, 5).map((task, i) => (
+            <TaskBlock key={task.id} index={i} status={task.status} />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Results (right side) */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2 }}
+        className="absolute right-8 top-1/2 -translate-y-1/2"
+      >
+        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-3">
+          Results
+        </div>
+        <div className="flex flex-col gap-1.5">
+          {tasksState.slice(5).map((task, i) => (
+            <TaskBlock key={task.id} index={i + 5} status={task.status} side="right" />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Incoming arrows */}
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={`arrow-in-${i}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 + i * 0.1 }}
+          className="absolute"
+          style={{
+            left: '25%',
+            top: `${30 + i * 10}%`,
+            width: '20%',
+          }}
+        >
+          <motion.div
+            className="h-px bg-gradient-to-r from-red-500/30 to-red-500"
+            animate={{ opacity: [0.3, 0.8, 0.3] }}
+            transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+          />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-red-500 border-y-2 border-y-transparent" />
+        </motion.div>
+      ))}
+
+      {/* Outgoing arrows (mostly failing) */}
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={`arrow-out-${i}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 + i * 0.1 }}
+          className="absolute"
+          style={{
+            left: '55%',
+            top: `${30 + i * 10}%`,
+            width: '20%',
+          }}
+        >
+          <motion.div
+            className={`h-px ${i < 1 ? 'bg-gradient-to-r from-green-500 to-green-500/30' : 'bg-gradient-to-r from-red-500/50 to-red-500/10'}`}
+            animate={{ opacity: i < 1 ? [0.8, 1, 0.8] : [0.2, 0.5, 0.2] }}
+            transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
+          />
+        </motion.div>
+      ))}
+
+      {/* Status badges */}
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+        <StatusLabel label="Bottlenecks" variant="error" />
+        <StatusLabel label="Fragile" variant="error" />
+        <StatusLabel label="Limited" variant="error" />
+      </div>
+    </div>
+  );
+};
+
+const TaskBlock = ({ index, status, side = 'left' }: { index: number; status: string; side?: 'left' | 'right' }) => {
+  const getStatusStyle = () => {
+    switch (status) {
+      case 'complete':
+        return 'bg-green-500/80 border-green-400 text-green-200';
+      case 'failed':
+        return 'bg-red-500/80 border-red-400 text-red-200';
+      case 'timeout':
+        return 'bg-yellow-500/80 border-yellow-400 text-yellow-200';
+      case 'processing':
+        return 'bg-primary/60 border-primary text-primary-foreground animate-pulse';
+      default:
+        return 'bg-muted/40 border-muted-foreground/30 text-muted-foreground';
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'complete': return '✓';
+      case 'failed': return '✕';
+      case 'timeout': return '⏱';
+      case 'processing': return '◌';
+      default: return '○';
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: side === 'left' ? -10 : 10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.08 }}
+      className={`w-16 h-7 border flex items-center justify-center gap-1 ${getStatusStyle()}`}
+    >
+      <span className="text-[9px]">{getStatusIcon()}</span>
+      <span className="text-[9px] font-mono">T{index + 1}</span>
+    </motion.div>
+  );
+};
+
+// ============ TEAM AGENT VIEW ============
+const TeamAgentView = () => {
+  const [completedCount, setCompletedCount] = useState(0);
+
+  useEffect(() => {
+    // Animate completion counter
+    const interval = setInterval(() => {
+      setCompletedCount(prev => {
+        if (prev >= 10) {
+          clearInterval(interval);
+          return 10;
+        }
+        return prev + 1;
+      });
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const departments = [
+    {
+      name: 'Research',
+      color: 'hsl(200 80% 55%)',
+      lead: { id: 'research-lead', label: 'R-LEAD', status: 'active' },
+      workers: [
+        { id: 'scraper', label: 'SCRAPER', status: 'complete' },
+        { id: 'analyst', label: 'ANALYST', status: 'active' },
+      ]
+    },
+    {
+      name: 'Content',
+      color: 'hsl(var(--primary))',
+      lead: { id: 'content-lead', label: 'C-LEAD', status: 'active' },
+      workers: [
+        { id: 'writer', label: 'WRITER', status: 'active' },
+        { id: 'editor', label: 'EDITOR', status: 'idle' },
+      ]
+    },
+    {
+      name: 'Ops',
+      color: 'hsl(160 70% 50%)',
+      lead: { id: 'ops-lead', label: 'O-LEAD', status: 'idle' },
+      workers: [
+        { id: 'qa', label: 'QA', status: 'idle' },
+        { id: 'publisher', label: 'PUB', status: 'idle' },
+      ]
+    }
+  ];
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Grid background */}
+      <div className="absolute inset-0 bg-grid-fine opacity-15" />
+
+      {/* Metrics Panel */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        className="absolute top-0 left-0 bg-card/80 border border-green-500/30 p-4"
+      >
+        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Performance</div>
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-mono text-green-400">{completedCount}</span>
+          <span className="text-lg font-mono text-muted-foreground">/10</span>
+        </div>
+        <div className="text-[10px] font-mono text-green-400 mt-1">
+          0 FAILED
+        </div>
+        
+        {/* Success progress bar */}
+        <div className="mt-3 w-32 h-1.5 bg-muted/30 border border-green-500/20">
+          <motion.div 
+            className="h-full bg-green-500"
+            initial={{ width: 0 }}
+            animate={{ width: `${completedCount * 10}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+        <div className="text-[9px] font-mono text-green-400/70 mt-1">OPTIMAL</div>
+      </motion.div>
+
+      {/* Orchestrator */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="absolute left-1/2 -translate-x-1/2 top-4"
+      >
+        <AgentNode 
+          label="ORCHESTRATOR" 
+          color="hsl(45 100% 60%)" 
+          size="lg" 
+          status="active"
+        />
+      </motion.div>
+
+      {/* Command lines from Orchestrator to Leads */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+        <defs>
+          <marker id="arrow-cmd-team" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill="hsl(45 100% 60%)" fillOpacity="0.8" />
+          </marker>
+        </defs>
+        
+        {/* Orchestrator to leads */}
+        {departments.map((dept, i) => {
+          const xPos = 20 + i * 30;
+          return (
+            <motion.g key={dept.name}>
+              <motion.line
+                x1="50%"
+                y1="80"
+                x2={`${xPos + 5}%`}
+                y2="140"
+                stroke="hsl(45 100% 60%)"
+                strokeWidth="2"
+                strokeOpacity="0.6"
+                markerEnd="url(#arrow-cmd-team)"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
+              />
+              {/* Animated particle */}
+              <motion.circle
+                r="3"
+                fill="hsl(45 100% 60%)"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: [0, 1, 1, 0],
+                  cx: ['50%', `${xPos + 5}%`],
+                  cy: [80, 140]
+                }}
+                transition={{
+                  duration: 1.5,
+                  delay: 0.8 + i * 0.3,
+                  repeat: Infinity,
+                  repeatDelay: 2
+                }}
+              />
+            </motion.g>
+          );
+        })}
+
+        {/* Data flows between workers */}
+        <motion.line
+          x1="30%"
+          y1="280"
+          x2="50%"
+          y2="280"
+          stroke="hsl(160 70% 50%)"
+          strokeWidth="1.5"
+          strokeDasharray="6 4"
+          strokeOpacity="0.6"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ delay: 1.2, duration: 0.5 }}
+        />
+        <motion.line
+          x1="60%"
+          y1="280"
+          x2="78%"
+          y2="280"
+          stroke="hsl(160 70% 50%)"
+          strokeWidth="1.5"
+          strokeDasharray="6 4"
+          strokeOpacity="0.6"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ delay: 1.4, duration: 0.5 }}
+        />
+      </svg>
+
+      {/* Departments */}
+      <div className="absolute inset-x-4 top-[130px] flex justify-center gap-4 md:gap-8">
+        {departments.map((dept, deptIndex) => (
+          <motion.div
+            key={dept.name}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + deptIndex * 0.1 }}
+            className="flex-1 max-w-[180px]"
+          >
+            {/* Department container */}
+            <div 
+              className="border rounded-sm p-3 bg-card/40"
+              style={{ borderColor: `${dept.color}40` }}
+            >
+              {/* Department name */}
+              <div 
+                className="text-[10px] font-mono uppercase tracking-widest mb-3 pb-2 border-b text-center"
+                style={{ color: dept.color, borderColor: `${dept.color}30` }}
+              >
+                {dept.name}
+              </div>
+
+              {/* Lead */}
+              <div className="flex justify-center mb-4">
+                <AgentNode 
+                  label={dept.lead.label} 
+                  color={dept.color} 
+                  size="md" 
+                  status={dept.lead.status as 'active' | 'idle' | 'complete'}
+                />
+              </div>
+
+              {/* Workers */}
+              <div className="flex justify-center gap-2">
+                {dept.workers.map((worker, wIndex) => (
+                  <motion.div
+                    key={worker.id}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 + deptIndex * 0.1 + wIndex * 0.05 }}
+                  >
+                    <AgentNode 
+                      label={worker.label} 
+                      color="hsl(185 80% 55%)" 
+                      size="sm" 
+                      status={worker.status as 'active' | 'idle' | 'complete'}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Data particles flowing */}
+      <DataParticles />
+
+      {/* Status badges */}
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+        <StatusLabel label="Parallel" variant="success" />
+        <StatusLabel label="Structured" variant="success" />
+        <StatusLabel label="Reliable" variant="success" />
+      </div>
+    </div>
+  );
+};
+
+const AgentNode = ({ 
+  label, 
+  color, 
+  size = 'md',
+  status = 'idle'
+}: { 
+  label: string; 
+  color: string; 
+  size?: 'sm' | 'md' | 'lg';
+  status?: 'idle' | 'active' | 'complete';
+}) => {
+  const sizeClasses = {
+    sm: 'w-14 h-10 text-[8px]',
+    md: 'w-16 h-11 text-[9px]',
+    lg: 'w-24 h-12 text-[10px]'
+  };
+
+  const statusColors = {
+    idle: 'bg-muted-foreground/50',
+    active: 'bg-primary animate-pulse',
+    complete: 'bg-green-400'
+  };
+
+  return (
+    <div className="relative group">
+      {/* Glow effect */}
+      <motion.div 
+        className="absolute -inset-2 blur-lg opacity-0 group-hover:opacity-40 transition-opacity"
+        style={{ backgroundColor: color }}
+      />
+      
+      <div 
+        className={`relative ${sizeClasses[size]} bg-card border-2 flex items-center justify-center transition-all group-hover:scale-105`}
+        style={{ borderColor: color }}
+      >
+        {/* Corner accents */}
+        <div className="absolute -top-px -left-px w-2 h-2 border-l-2 border-t-2" style={{ borderColor: color }} />
+        <div className="absolute -top-px -right-px w-2 h-2 border-r-2 border-t-2" style={{ borderColor: color }} />
+        <div className="absolute -bottom-px -left-px w-2 h-2 border-l-2 border-b-2" style={{ borderColor: color }} />
+        <div className="absolute -bottom-px -right-px w-2 h-2 border-r-2 border-b-2" style={{ borderColor: color }} />
+
+        {/* Status indicator */}
+        <div 
+          className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${statusColors[status]}`}
+          style={{ boxShadow: status === 'active' ? `0 0 8px ${color}` : 'none' }}
+        />
+
+        <span className="font-mono uppercase tracking-wider" style={{ color }}>
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+const DataParticles = () => {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Animated particles flowing between nodes */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1.5 h-1.5 bg-green-400 rounded-full"
+          style={{ boxShadow: '0 0 8px hsl(160 70% 50%)' }}
+          initial={{ 
+            x: '20%', 
+            y: '55%', 
+            opacity: 0 
+          }}
+          animate={{ 
+            x: ['20%', '50%', '80%'],
+            y: ['55%', '50%', '55%'],
+            opacity: [0, 1, 1, 0]
+          }}
+          transition={{
+            duration: 3,
+            delay: i * 0.5,
+            repeat: Infinity,
+            repeatDelay: 1,
+            ease: "linear"
+          }}
+        />
+      ))}
+    </div>
   );
 };
 
@@ -139,278 +761,15 @@ const StatusLabel = ({ label, variant }: { label: string; variant: "success" | "
     : "bg-red-400";
 
   return (
-    <span className={`inline-flex items-center gap-2 px-3 py-1.5 border text-[10px] font-mono uppercase tracking-widest ${styles}`}>
-      <span className={`w-1 h-1 ${dotStyle}`} style={{ boxShadow: `0 0 6px currentColor` }} />
+    <motion.span 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8 }}
+      className={`inline-flex items-center gap-2 px-3 py-1.5 border text-[10px] font-mono uppercase tracking-widest ${styles}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${dotStyle}`} style={{ boxShadow: `0 0 6px currentColor` }} />
       {label}
-    </span>
-  );
-};
-
-const SingleAgentView = () => {
-  return (
-    <div className="relative w-full h-full flex items-center justify-center">
-      <div className="absolute inset-0 bg-grid-fine opacity-30" />
-      
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="relative"
-      >
-        {/* Central overloaded node */}
-        <div className="relative">
-          <motion.div 
-            className="absolute inset-0 bg-red-500/20 blur-xl"
-            animate={{ opacity: [0.4, 0.7, 0.4] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <div className="relative w-24 h-24 bg-card border-2 border-red-500/50 flex items-center justify-center">
-            <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-red-500" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-red-500" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-red-500" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-red-500" />
-            
-            <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest">Overload</span>
-          </div>
-        </div>
-
-        {/* Chaotic connections */}
-        {[0, 72, 144, 216, 288].map((angle, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 + i * 0.08, duration: 0.4, ease: "easeOut" }}
-            className="absolute w-16 h-px bg-gradient-to-r from-red-500/50 to-transparent"
-            style={{
-              transform: `rotate(${angle}deg)`,
-              transformOrigin: "0 50%",
-              left: "50%",
-              top: "50%",
-            }}
-          >
-            <div 
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 border border-red-500/40 bg-red-500/10"
-              style={{ transform: `rotate(-${angle}deg)` }}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
-    </div>
-  );
-};
-
-const TeamAgentView = () => {
-  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-
-  // Complex hierarchical structure with multiple departments
-  const nodes = [
-    // Executive layer
-    { id: "orchestrator", label: "ORCH", role: "Orchestrator", x: 50, y: 8, tier: "exec" },
-    
-    // Department heads
-    { id: "research-lead", label: "R-LEAD", role: "Research Lead", x: 22, y: 32, tier: "lead" },
-    { id: "content-lead", label: "C-LEAD", role: "Content Lead", x: 50, y: 32, tier: "lead" },
-    { id: "ops-lead", label: "O-LEAD", role: "Ops Lead", x: 78, y: 32, tier: "lead" },
-    
-    // Workers - Research team
-    { id: "scraper", label: "SCRP", role: "Scraper", x: 10, y: 60, tier: "worker" },
-    { id: "analyst", label: "ANLY", role: "Analyst", x: 28, y: 60, tier: "worker" },
-    
-    // Workers - Content team  
-    { id: "writer", label: "WRIT", role: "Writer", x: 42, y: 60, tier: "worker" },
-    { id: "editor", label: "EDIT", role: "Editor", x: 58, y: 60, tier: "worker" },
-    
-    // Workers - Ops team
-    { id: "qa", label: "QA", role: "QA Agent", x: 72, y: 60, tier: "worker" },
-    { id: "publisher", label: "PUB", role: "Publisher", x: 90, y: 60, tier: "worker" },
-    
-    // Shared resources
-    { id: "memory", label: "MEM", role: "Shared Memory", x: 50, y: 85, tier: "resource" },
-  ];
-
-  const connections = [
-    // Executive to leads
-    { from: "orchestrator", to: "research-lead", type: "command" },
-    { from: "orchestrator", to: "content-lead", type: "command" },
-    { from: "orchestrator", to: "ops-lead", type: "command" },
-    
-    // Research lead to workers
-    { from: "research-lead", to: "scraper", type: "delegate" },
-    { from: "research-lead", to: "analyst", type: "delegate" },
-    
-    // Content lead to workers
-    { from: "content-lead", to: "writer", type: "delegate" },
-    { from: "content-lead", to: "editor", type: "delegate" },
-    
-    // Ops lead to workers
-    { from: "ops-lead", to: "qa", type: "delegate" },
-    { from: "ops-lead", to: "publisher", type: "delegate" },
-    
-    // Cross-team data flows
-    { from: "analyst", to: "writer", type: "data" },
-    { from: "editor", to: "qa", type: "data" },
-    { from: "qa", to: "publisher", type: "data" },
-    
-    // Memory connections (bidirectional concept)
-    { from: "analyst", to: "memory", type: "sync" },
-    { from: "writer", to: "memory", type: "sync" },
-    { from: "qa", to: "memory", type: "sync" },
-  ];
-
-  const getNodeById = (id: string) => nodes.find(n => n.id === id);
-
-  const getTierStyle = (tier: string) => {
-    switch (tier) {
-      case "exec": return { color: "hsl(45 100% 60%)", size: 44 };
-      case "lead": return { color: "hsl(var(--primary))", size: 38 };
-      case "worker": return { color: "hsl(185 80% 55%)", size: 32 };
-      case "resource": return { color: "hsl(280 80% 65%)", size: 36 };
-      default: return { color: "hsl(var(--primary))", size: 32 };
-    }
-  };
-
-  const getConnectionOpacity = (fromId: string, toId: string) => {
-    if (!hoveredNode) return 0.5;
-    if (fromId === hoveredNode || toId === hoveredNode) return 1;
-    return 0.15;
-  };
-
-  return (
-    <div className="relative w-full h-full">
-      <div className="absolute inset-0 bg-grid-fine opacity-25" />
-      
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <filter id="glow-team" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <marker id="arrow-cmd" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
-            <polygon points="0 0, 4 2, 0 4" fill="hsl(var(--primary))" fillOpacity="0.7" />
-          </marker>
-          <marker id="arrow-data" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
-            <polygon points="0 0, 4 2, 0 4" fill="hsl(160 100% 50%)" fillOpacity="0.7" />
-          </marker>
-          <marker id="arrow-sync" markerWidth="3" markerHeight="3" refX="2" refY="1.5" orient="auto">
-            <polygon points="0 0, 3 1.5, 0 3" fill="hsl(280 80% 65%)" fillOpacity="0.7" />
-          </marker>
-        </defs>
-        
-        {connections.map((conn, i) => {
-          const from = getNodeById(conn.from);
-          const to = getNodeById(conn.to);
-          if (!from || !to) return null;
-          
-          const opacity = getConnectionOpacity(conn.from, conn.to);
-          const isData = conn.type === "data";
-          const isSync = conn.type === "sync";
-          const strokeColor = isSync 
-            ? "hsl(280 80% 65%)" 
-            : isData 
-              ? "hsl(160 100% 50%)" 
-              : "hsl(var(--primary))";
-          const markerId = isSync ? "arrow-sync" : isData ? "arrow-data" : "arrow-cmd";
-          
-          return (
-            <motion.line
-              key={i}
-              x1={`${from.x}%`}
-              y1={`${from.y + 4}%`}
-              x2={`${to.x}%`}
-              y2={`${to.y - 2}%`}
-              stroke={strokeColor}
-              strokeWidth={isSync ? 0.5 : 0.8}
-              strokeDasharray={isData || isSync ? "3 2" : "none"}
-              markerEnd={`url(#${markerId})`}
-              filter="url(#glow-team)"
-              initial={{ opacity: 0, pathLength: 0 }}
-              animate={{ opacity: opacity * 0.7, pathLength: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.03, ease: "easeOut" }}
-            />
-          );
-        })}
-      </svg>
-
-      {/* Agent nodes */}
-      {nodes.map((node, i) => {
-        const style = getTierStyle(node.tier);
-        const isHovered = hoveredNode === node.id;
-        const isDimmed = hoveredNode && !isHovered;
-        const sizePx = style.size;
-        
-        return (
-          <motion.div
-            key={node.id}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: isHovered ? 1.06 : 1, opacity: isDimmed ? 0.35 : 1 }}
-            transition={{ delay: 0.05 + i * 0.03, duration: 0.4, ease: "easeOut" }}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{ left: `${node.x}%`, top: `${node.y}%` }}
-            onMouseEnter={() => setHoveredNode(node.id)}
-            onMouseLeave={() => setHoveredNode(null)}
-          >
-            <div className="relative group cursor-pointer">
-              <motion.div 
-                className="absolute -inset-1.5 blur-md"
-                style={{ backgroundColor: style.color }}
-                animate={{ opacity: isHovered ? 0.3 : 0 }}
-                transition={{ duration: 0.25 }}
-              />
-              <motion.div 
-                className="relative flex items-center justify-center bg-card border"
-                style={{ 
-                  width: sizePx, 
-                  height: sizePx,
-                  borderColor: style.color,
-                  borderRadius: node.tier === "resource" ? "50%" : "2px",
-                  boxShadow: isHovered 
-                    ? `0 0 20px ${style.color}50` 
-                    : `0 0 8px ${style.color}20`
-                }}
-                whileHover={{ backgroundColor: `${style.color}15` }}
-                transition={{ duration: 0.25 }}
-              >
-                {node.tier !== "resource" && (
-                  <>
-                    <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t" style={{ borderColor: style.color }} />
-                    <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t" style={{ borderColor: style.color }} />
-                    <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b" style={{ borderColor: style.color }} />
-                    <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b" style={{ borderColor: style.color }} />
-                  </>
-                )}
-                
-                <div 
-                  className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background rounded-full" 
-                  style={{ boxShadow: '0 0 4px #4ade80' }} 
-                />
-                
-                <span 
-                  className="text-[8px] font-mono uppercase tracking-wider"
-                  style={{ color: style.color }}
-                >
-                  {node.label}
-                </span>
-              </motion.div>
-              
-              {/* Tooltip */}
-              <motion.div
-                initial={{ opacity: 0, y: 3 }}
-                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 3 }}
-                transition={{ duration: 0.2 }}
-                className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-card border whitespace-nowrap pointer-events-none z-10"
-                style={{ borderColor: `${style.color}60` }}
-              >
-                <span className="text-[8px] font-mono" style={{ color: style.color }}>{node.role}</span>
-              </motion.div>
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
+    </motion.span>
   );
 };
 
