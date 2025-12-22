@@ -235,95 +235,146 @@ const HeroSection = () => {
 const WorkflowVisualization = () => {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   
+  // Hierarchical org structure: Orchestrator at top, managers, then workers
   const nodes = [
-    { id: "input", label: "INPUT", role: "Trigger", x: 10, y: 50, icon: "→" },
-    { id: "research", label: "RSRCH", role: "Researcher", x: 80, y: 50 },
-    { id: "write", label: "WRITE", role: "Writer", x: 150, y: 50 },
-    { id: "review", label: "REVW", role: "QA Reviewer", x: 220, y: 50 },
-    { id: "post", label: "POST", role: "Publisher", x: 290, y: 50 },
+    // Top level - Orchestrator
+    { id: "orchestrator", label: "ORCH", role: "Orchestrator", x: 155, y: 8, tier: "leader", icon: "◈" },
+    
+    // Middle level - Managers
+    { id: "research-mgr", label: "R-MGR", role: "Research Lead", x: 70, y: 55, tier: "manager" },
+    { id: "content-mgr", label: "C-MGR", role: "Content Lead", x: 240, y: 55, tier: "manager" },
+    
+    // Bottom level - Workers
+    { id: "web-scraper", label: "SCRP", role: "Web Scraper", x: 15, y: 105, tier: "worker" },
+    { id: "analyst", label: "ANLY", role: "Data Analyst", x: 70, y: 105, tier: "worker" },
+    { id: "fact-check", label: "FACT", role: "Fact Checker", x: 125, y: 105, tier: "worker" },
+    { id: "writer", label: "WRIT", role: "Writer", x: 195, y: 105, tier: "worker" },
+    { id: "editor", label: "EDIT", role: "Editor", x: 250, y: 105, tier: "worker" },
+    { id: "publisher", label: "PUB", role: "Publisher", x: 305, y: 105, tier: "worker" },
   ];
 
+  // Connections showing hierarchy and cross-team communication
   const connections = [
-    { from: 0, to: 1 },
-    { from: 1, to: 2 },
-    { from: 2, to: 3 },
-    { from: 3, to: 4 },
+    // Orchestrator to managers
+    { from: "orchestrator", to: "research-mgr", type: "command" },
+    { from: "orchestrator", to: "content-mgr", type: "command" },
+    
+    // Research manager to workers
+    { from: "research-mgr", to: "web-scraper", type: "delegate" },
+    { from: "research-mgr", to: "analyst", type: "delegate" },
+    { from: "research-mgr", to: "fact-check", type: "delegate" },
+    
+    // Content manager to workers
+    { from: "content-mgr", to: "writer", type: "delegate" },
+    { from: "content-mgr", to: "editor", type: "delegate" },
+    { from: "content-mgr", to: "publisher", type: "delegate" },
+    
+    // Cross-team data flow
+    { from: "analyst", to: "writer", type: "data" },
+    { from: "fact-check", to: "editor", type: "data" },
   ];
 
-  const getConnectionOpacity = (fromIdx: number, toIdx: number) => {
+  const getNodeById = (id: string) => nodes.find(n => n.id === id);
+
+  const getConnectionOpacity = (fromId: string, toId: string) => {
     if (!hoveredNode) return 0.5;
-    const fromNode = nodes[fromIdx];
-    const toNode = nodes[toIdx];
-    if (fromNode.id === hoveredNode || toNode.id === hoveredNode) return 0.9;
-    return 0.2;
+    if (fromId === hoveredNode || toId === hoveredNode) return 1;
+    return 0.15;
+  };
+
+  const getTierColor = (tier: string) => {
+    switch (tier) {
+      case "leader": return "hsl(45 100% 60%)"; // Gold
+      case "manager": return "hsl(var(--primary))";
+      case "worker": return "hsl(var(--primary) / 0.7)";
+      default: return "hsl(var(--primary))";
+    }
+  };
+
+  const getNodeSize = (tier: string) => {
+    switch (tier) {
+      case "leader": return 36;
+      case "manager": return 30;
+      case "worker": return 26;
+      default: return 26;
+    }
   };
 
   return (
-    <div className="relative w-full h-[140px]">
-      <div className="absolute inset-0 bg-grid-fine opacity-40" />
+    <div className="relative w-full h-[160px]">
+      <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 360 140" preserveAspectRatio="xMidYMid meet">
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 360 160" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <filter id="glow-line" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id="glow-line-hero" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <polygon points="0 0, 6 3, 0 6" fill="hsl(var(--primary))" fillOpacity="0.6" />
+          <marker id="arrow-command" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill="hsl(var(--primary))" fillOpacity="0.8" />
+          </marker>
+          <marker id="arrow-data" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+            <polygon points="0 0, 5 2.5, 0 5" fill="hsl(160 100% 45%)" fillOpacity="0.8" />
           </marker>
         </defs>
 
         {connections.map((conn, i) => {
-          const from = nodes[conn.from];
-          const to = nodes[conn.to];
-          const fromX = from.x + 28;
-          const toX = to.x + 2;
-          const y = 70;
+          const from = getNodeById(conn.from);
+          const to = getNodeById(conn.to);
+          if (!from || !to) return null;
+
+          const fromSize = getNodeSize(from.tier);
+          const toSize = getNodeSize(to.tier);
+          const fromX = from.x + fromSize / 2;
+          const fromY = from.y + fromSize;
+          const toX = to.x + toSize / 2;
+          const toY = to.y;
+          
           const opacity = getConnectionOpacity(conn.from, conn.to);
+          const isDataFlow = conn.type === "data";
+          const strokeColor = isDataFlow ? "hsl(160 100% 45%)" : "hsl(var(--primary))";
+          const markerId = isDataFlow ? "arrow-data" : "arrow-command";
+          
+          // Create curved paths for hierarchy, straight dashed for data flow
+          const midY = (fromY + toY) / 2;
+          const path = isDataFlow 
+            ? `M ${fromX} ${fromY - 5} L ${toX} ${toY + 5}`
+            : `M ${fromX} ${fromY} Q ${fromX} ${midY} ${(fromX + toX) / 2} ${midY} Q ${toX} ${midY} ${toX} ${toY}`;
           
           return (
             <g key={i}>
-              <motion.line
-                x1={fromX}
-                y1={y}
-                x2={toX}
-                y2={y}
-                stroke="hsl(var(--primary))"
-                strokeWidth="1"
-                filter="url(#glow-line)"
+              <motion.path
+                d={path}
+                stroke={strokeColor}
+                strokeWidth={isDataFlow ? 1 : 1.5}
+                strokeDasharray={isDataFlow ? "4 3" : "none"}
+                fill="none"
+                filter="url(#glow-line-hero)"
+                markerEnd={`url(#${markerId})`}
                 initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: opacity * 0.4 }}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                animate={{ pathLength: 1, opacity: opacity * 0.7 }}
+                transition={{ delay: 0.2 + i * 0.05, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               />
-              <motion.line
-                x1={fromX}
-                y1={y}
-                x2={toX}
-                y2={y}
-                stroke="hsl(var(--primary))"
-                strokeWidth="1.5"
-                markerEnd="url(#arrowhead)"
-                initial={{ opacity: 0 }}
-                animate={{ opacity }}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
-              />
+              {/* Animated data particle */}
               <motion.circle
-                cx={fromX}
-                cy={y}
                 r="2"
-                fill="hsl(var(--primary))"
-                initial={{ cx: fromX, opacity: 0 }}
-                animate={{ cx: toX, opacity: 0.8 }}
-                transition={{ 
-                  delay: 0.8 + i * 0.15, 
-                  duration: 0.8, 
-                  repeat: Infinity, 
-                  repeatDelay: 2.5,
-                  ease: [0.25, 0.1, 0.25, 1]
+                fill={strokeColor}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: [0, 0.9, 0],
+                  offsetDistance: ["0%", "100%"],
                 }}
+                transition={{
+                  delay: 1 + i * 0.1,
+                  duration: 1.2,
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  ease: [0.25, 0.1, 0.25, 1],
+                }}
+                style={{ offsetPath: `path("${path}")` }}
               />
             </g>
           );
@@ -333,16 +384,18 @@ const WorkflowVisualization = () => {
       {nodes.map((node, i) => {
         const isHovered = hoveredNode === node.id;
         const isDimmed = hoveredNode && !isHovered;
+        const size = getNodeSize(node.tier);
+        const tierColor = getTierColor(node.tier);
         
         return (
           <motion.div
             key={node.id}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ 
-              scale: isHovered ? 1.04 : 1, 
-              opacity: isDimmed ? 0.4 : 1 
+              scale: isHovered ? 1.06 : 1, 
+              opacity: isDimmed ? 0.35 : 1 
             }}
-            transition={{ delay: i * 0.08, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ delay: i * 0.04, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             className="absolute"
             style={{ left: node.x, top: node.y }}
             onMouseEnter={() => setHoveredNode(node.id)}
@@ -350,35 +403,55 @@ const WorkflowVisualization = () => {
           >
             <div className="relative group cursor-pointer">
               <motion.div 
-                className="absolute -inset-1 bg-primary/15 blur-md"
-                animate={{ opacity: isHovered ? 1 : 0 }}
+                className="absolute -inset-1.5 blur-md"
+                style={{ backgroundColor: tierColor }}
+                animate={{ opacity: isHovered ? 0.25 : 0 }}
                 transition={{ duration: 0.3 }}
               />
               
               <motion.div 
-                className="relative w-[30px] h-[30px] bg-card border border-primary/50 flex items-center justify-center transition-colors duration-300"
-                animate={{ 
-                  borderColor: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--primary) / 0.5)',
-                  backgroundColor: isHovered ? 'hsl(var(--primary) / 0.15)' : 'hsl(var(--card))'
+                className="relative flex items-center justify-center transition-colors duration-300"
+                style={{ 
+                  width: size, 
+                  height: size,
+                  backgroundColor: isHovered ? `${tierColor}20` : 'hsl(var(--card))',
+                  border: `1px solid ${tierColor}`,
+                  boxShadow: isHovered 
+                    ? `0 0 20px ${tierColor}50` 
+                    : `0 0 8px ${tierColor}25`
                 }}
-                style={{ boxShadow: isHovered ? '0 0 20px hsl(var(--primary) / 0.3)' : '0 0 12px hsl(var(--primary) / 0.15)' }}
               >
-                <div className="absolute -top-px -left-px w-2 h-2 border-l border-t border-primary" />
-                <div className="absolute -top-px -right-px w-2 h-2 border-r border-t border-primary" />
-                <div className="absolute -bottom-px -left-px w-2 h-2 border-l border-b border-primary" />
-                <div className="absolute -bottom-px -right-px w-2 h-2 border-r border-b border-primary" />
+                {/* Corner accents */}
+                <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t" style={{ borderColor: tierColor }} />
+                <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t" style={{ borderColor: tierColor }} />
+                <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b" style={{ borderColor: tierColor }} />
+                <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b" style={{ borderColor: tierColor }} />
                 
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 border border-background" 
-                     style={{ boxShadow: '0 0 6px #4ade80' }} />
+                {/* Status indicator */}
+                <div 
+                  className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background" 
+                  style={{ boxShadow: '0 0 4px #4ade80' }} 
+                />
                 
                 {node.icon ? (
-                  <span className="text-xs text-primary">{node.icon}</span>
+                  <span className="text-sm" style={{ color: tierColor }}>{node.icon}</span>
                 ) : (
-                  <div className="w-2.5 h-2.5 bg-primary/40 border border-primary/60" />
+                  <div 
+                    className="border" 
+                    style={{ 
+                      width: size * 0.35, 
+                      height: size * 0.35, 
+                      backgroundColor: `${tierColor}40`,
+                      borderColor: `${tierColor}80`
+                    }} 
+                  />
                 )}
               </motion.div>
               
-              <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] font-mono text-primary/70 uppercase tracking-wider whitespace-nowrap">
+              <span 
+                className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-mono uppercase tracking-wider whitespace-nowrap"
+                style={{ color: `${tierColor}90` }}
+              >
                 {node.label}
               </span>
               
@@ -387,9 +460,10 @@ const WorkflowVisualization = () => {
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 4 }}
                 transition={{ duration: 0.2 }}
-                className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-card border border-primary/40 whitespace-nowrap pointer-events-none"
+                className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 bg-card border whitespace-nowrap pointer-events-none z-10"
+                style={{ borderColor: `${tierColor}60` }}
               >
-                <span className="text-[9px] font-mono text-primary">{node.role}</span>
+                <span className="text-[9px] font-mono" style={{ color: tierColor }}>{node.role}</span>
               </motion.div>
             </div>
           </motion.div>
@@ -398,5 +472,6 @@ const WorkflowVisualization = () => {
     </div>
   );
 };
+
 
 export default HeroSection;
