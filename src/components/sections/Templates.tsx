@@ -1,18 +1,115 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import { FileText, Users, Search, MessageSquare } from "lucide-react";
+import { useRef, useState } from "react";
+import { 
+  Lightbulb, Brain, TrendingUp, Handshake, 
+  Megaphone, Headphones, LineChart, Video,
+  ChevronDown
+} from "lucide-react";
 import { InfiniteGridCard } from "@/components/ui/infinite-grid-card";
+
+interface Template {
+  icon: React.ElementType;
+  title: string;
+  archetype: string;
+  primaryValue: string;
+  description: string;
+  agents: string[];
+  whyItMatters: string;
+  category: "core" | "specialized";
+}
 
 const Templates = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
-  const templates = [
-    { icon: FileText, title: "Content Engine", tools: ["seo", "writer", "editor", "pub"] },
-    { icon: Search, title: "Lead Generation", tools: ["scrape", "enrich", "score", "sync"] },
-    { icon: Users, title: "Research & Monitor", tools: ["crawl", "analyze", "report", "alert"] },
-    { icon: MessageSquare, title: "Community Ops", tools: ["respond", "triage", "escalate", "log"] },
+  const templates: Template[] = [
+    // Core Templates
+    {
+      icon: Lightbulb,
+      title: "Idea → MVP Builder",
+      archetype: "Solo Builder",
+      primaryValue: "Time saving + clarity",
+      description: "Turns raw ideas into scoped features. Breaks ideas into tasks, milestones, and priorities. Flags technical and UX risks early.",
+      agents: ["Product Strategist", "Technical Architect", "UX Reviewer"],
+      whyItMatters: "Removes the \"where do I even start?\" tax that kills momentum.",
+      category: "core"
+    },
+    {
+      icon: Brain,
+      title: "Founder's Second Brain",
+      archetype: "Solo Builder / Operator",
+      primaryValue: "Decision support + time saving",
+      description: "Stores context across projects, ideas, and conversations. Helps with prioritization and tradeoffs. Answers \"What should I work on today?\"",
+      agents: ["Memory Agent", "Strategy Agent", "Execution Planner"],
+      whyItMatters: "Founders don't need more ideas. They need fewer decisions.",
+      category: "core"
+    },
+    {
+      icon: TrendingUp,
+      title: "Growth & Distribution Engine",
+      archetype: "Operator / Growth Lead",
+      primaryValue: "Growth + distribution",
+      description: "Scans trends and competitors. Generates content ideas. Handles replies, engagement, and iteration loops.",
+      agents: ["Trend Scanner", "Content Generator", "Engagement Agent", "Performance Analyst"],
+      whyItMatters: "Turns growth from \"hope\" into a system.",
+      category: "core"
+    },
+    {
+      icon: Handshake,
+      title: "Outbound Sales & BD Machine",
+      archetype: "Small Team / Operator",
+      primaryValue: "Business development",
+      description: "Researches leads and partners. Qualifies them automatically. Crafts personalized outreach and follow-ups. Maintains CRM memory.",
+      agents: ["Research Agent", "Qualification Agent", "Outreach Agent", "Follow-up Agent"],
+      whyItMatters: "Replaces an entire SDR motion for early teams.",
+      category: "core"
+    },
+    {
+      icon: Megaphone,
+      title: "Marketing Campaign Studio",
+      archetype: "Small Team / Startup",
+      primaryValue: "Marketing + speed",
+      description: "Plans campaigns end-to-end. Generates copy, visuals, and launch timelines. Coordinates multi-channel releases.",
+      agents: ["Campaign Strategist", "Copy Agent", "Creative Agent", "QA / Brand Guard"],
+      whyItMatters: "Campaigns stop being one-off chaos and start compounding.",
+      category: "core"
+    },
+    {
+      icon: Headphones,
+      title: "Customer Support Command Center",
+      archetype: "Startup / Operator",
+      primaryValue: "Time saving + scale",
+      description: "Handles frontline support. Diagnoses issues internally. Escalates only when needed. Learns from past tickets.",
+      agents: ["Frontline Support Agent", "Diagnostic Agent", "Knowledge Agent", "Escalation Agent"],
+      whyItMatters: "Support becomes leverage, not a bottleneck.",
+      category: "core"
+    },
+    // Specialized Templates
+    {
+      icon: LineChart,
+      title: "Web3 Trader Intelligence Desk",
+      archetype: "Trader (Web3-native)",
+      primaryValue: "Signal + speed",
+      description: "Ingests on-chain data, news, and social signals. Detects narrative shifts and anomalies. Stress-tests positions and scenarios.",
+      agents: ["Data Ingestion Agent", "Signal Detection Agent", "Risk & Scenario Agent", "Decision Assistant"],
+      whyItMatters: "This isn't \"AI trading.\" It's AI thinking with you.",
+      category: "specialized"
+    },
+    {
+      icon: Video,
+      title: "Content Creator Growth Factory",
+      archetype: "Content Creator",
+      primaryValue: "Growth + consistency",
+      description: "Turns long-form ideas into shorts, threads, and posts. Maintains voice and style. Optimizes timing, hooks, and formats.",
+      agents: ["Ideation Agent", "Repurposing Agent", "Style & Voice Agent", "Analytics Agent"],
+      whyItMatters: "Creators stay creative. The factory handles scale.",
+      category: "specialized"
+    },
   ];
+
+  const coreTemplates = templates.filter(t => t.category === "core");
+  const specializedTemplates = templates.filter(t => t.category === "specialized");
 
   return (
     <section ref={ref} id="templates" className="relative py-24 lg:py-28 overflow-hidden">
@@ -23,32 +120,180 @@ const Templates = () => {
             <span className="w-1 h-1 bg-primary" />Templates
           </div>
           <h2 className="font-heading text-2xl md:text-3xl font-medium mb-4 tracking-wider">
-            Proven <span className="text-primary">AI Teams</span>
+            Proven <span className="text-primary" style={{ textShadow: '0 0 30px hsl(var(--primary) / 0.5)' }}>AI Teams</span>
           </h2>
+          <p className="text-sm text-muted-foreground max-w-lg mx-auto">
+            Pre-built agent teams for common workflows. Deploy in minutes, customize as needed.
+          </p>
         </motion.div>
-        <div className="grid md:grid-cols-2 gap-4">
-          {templates.map((t, i) => (
-            <motion.div key={t.title} initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1 + i * 0.08 }}>
-              <InfiniteGridCard className="min-h-[100px]">
-                <div className="p-5 flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                    <t.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading text-sm uppercase tracking-wider mb-2">{t.title}</h3>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {t.tools.map((tool) => (
-                        <span key={tool} className="px-2 py-0.5 text-[9px] font-mono bg-muted/50 text-muted-foreground uppercase tracking-wider">{tool}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </InfiniteGridCard>
-            </motion.div>
-          ))}
+
+        {/* Core Templates */}
+        <div className="mb-10">
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={isInView ? { opacity: 1 } : {}}
+            className="flex items-center gap-2 mb-5"
+          >
+            <span className="text-[10px] font-mono text-primary uppercase tracking-widest">Core Templates</span>
+            <div className="flex-1 h-px bg-primary/20" />
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {coreTemplates.map((t, i) => (
+              <TemplateCard 
+                key={t.title} 
+                template={t} 
+                index={i} 
+                isInView={isInView}
+                isExpanded={expandedCard === t.title}
+                onToggle={() => setExpandedCard(expandedCard === t.title ? null : t.title)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Specialized Templates */}
+        <div>
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ delay: 0.4 }}
+            className="flex items-center gap-2 mb-5"
+          >
+            <span className="text-[10px] font-mono text-yellow-400 uppercase tracking-widest">Specialized Power Templates</span>
+            <div className="flex-1 h-px bg-yellow-400/20" />
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            {specializedTemplates.map((t, i) => (
+              <TemplateCard 
+                key={t.title} 
+                template={t} 
+                index={i + coreTemplates.length} 
+                isInView={isInView}
+                isExpanded={expandedCard === t.title}
+                onToggle={() => setExpandedCard(expandedCard === t.title ? null : t.title)}
+                isSpecialized
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
+  );
+};
+
+const TemplateCard = ({ 
+  template, 
+  index, 
+  isInView, 
+  isExpanded, 
+  onToggle,
+  isSpecialized = false 
+}: { 
+  template: Template; 
+  index: number; 
+  isInView: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
+  isSpecialized?: boolean;
+}) => {
+  const Icon = template.icon;
+  const accentColor = isSpecialized ? "hsl(45 100% 60%)" : "hsl(var(--primary))";
+  
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={isInView ? { opacity: 1, y: 0 } : {}} 
+      transition={{ delay: 0.1 + index * 0.06 }}
+    >
+      <InfiniteGridCard className="h-full">
+        <div className="p-4">
+          {/* Header */}
+          <div className="flex items-start gap-3 mb-3">
+            <div 
+              className="w-10 h-10 border flex items-center justify-center shrink-0"
+              style={{ 
+                borderColor: accentColor, 
+                backgroundColor: `${accentColor}15`,
+                boxShadow: `0 0 10px ${accentColor}20`
+              }}
+            >
+              {/* Corner accents */}
+              <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t" style={{ borderColor: accentColor }} />
+              <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t" style={{ borderColor: accentColor }} />
+              <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b" style={{ borderColor: accentColor }} />
+              <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b" style={{ borderColor: accentColor }} />
+              <Icon className="w-5 h-5" style={{ color: accentColor }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-heading text-sm uppercase tracking-wider mb-1" style={{ color: isSpecialized ? 'hsl(45 100% 70%)' : undefined }}>
+                {template.title}
+              </h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">
+                  {template.archetype}
+                </span>
+                <span className="text-[8px] text-muted-foreground">•</span>
+                <span className="text-[9px] font-mono uppercase tracking-wider" style={{ color: accentColor }}>
+                  {template.primaryValue}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+            {template.description}
+          </p>
+
+          {/* Agent Team */}
+          <div className="mb-3">
+            <span className="text-[8px] font-mono text-primary/50 uppercase tracking-widest block mb-1.5">Agent Team</span>
+            <div className="flex gap-1.5 flex-wrap">
+              {template.agents.map((agent) => (
+                <span 
+                  key={agent} 
+                  className="px-2 py-0.5 text-[8px] font-mono uppercase tracking-wider border"
+                  style={{ 
+                    backgroundColor: `${accentColor}10`,
+                    borderColor: `${accentColor}30`,
+                    color: accentColor
+                  }}
+                >
+                  {agent}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Expand/Collapse */}
+          <button 
+            onClick={onToggle}
+            className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <span>Why it matters</span>
+            <ChevronDown 
+              className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+            />
+          </button>
+
+          {/* Expanded Content */}
+          {isExpanded && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-3 pt-3 border-t border-primary/20"
+            >
+              <p className="text-[11px] text-foreground/80 italic leading-relaxed">
+                "{template.whyItMatters}"
+              </p>
+            </motion.div>
+          )}
+        </div>
+      </InfiniteGridCard>
+    </motion.div>
   );
 };
 
