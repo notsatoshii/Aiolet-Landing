@@ -81,12 +81,14 @@
 
   html {
     scroll-behavior: smooth;
+    font-size: 16px;
   }
 
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground font-body antialiased text-base;
     font-family: var(--font-body);
     letter-spacing: 0.01em;
+    line-height: 1.7;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -94,6 +96,31 @@
     @apply font-medium tracking-wide;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Increase small/subtext sizes */
+  .text-xs {
+    font-size: 0.8125rem; /* 13px instead of 12px */
+    line-height: 1.5;
+  }
+
+  .text-sm {
+    font-size: 0.9375rem; /* 15px instead of 14px */
+    line-height: 1.6;
+  }
+
+  .text-base {
+    font-size: 1.0625rem; /* 17px instead of 16px */
+    line-height: 1.7;
+  }
+
+  .text-lg {
+    font-size: 1.1875rem; /* 19px instead of 18px */
+    line-height: 1.6;
   }
 }
 
