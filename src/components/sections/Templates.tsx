@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { FileText, Users, Search, MessageSquare } from "lucide-react";
-import { SciFiCard } from "@/components/ui/scifi-panel";
+import { InfiniteGridCard } from "@/components/ui/infinite-grid-card";
 
 const Templates = () => {
   const ref = useRef(null);
@@ -29,7 +29,7 @@ const Templates = () => {
         <div className="grid md:grid-cols-2 gap-4">
           {templates.map((t, i) => (
             <motion.div key={t.title} initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1 + i * 0.08 }}>
-              <SciFiCard>
+              <InfiniteGridCard className="min-h-[100px]">
                 <div className="p-5 flex items-start gap-4">
                   <div className="w-10 h-10 bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
                     <t.icon className="w-5 h-5 text-primary" />
@@ -43,7 +43,7 @@ const Templates = () => {
                     </div>
                   </div>
                 </div>
-              </SciFiCard>
+              </InfiniteGridCard>
             </motion.div>
           ))}
         </div>
