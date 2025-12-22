@@ -307,7 +307,7 @@ const WorkflowVisualization = () => {
       <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
       {/* SVG for connections - uses viewBox for perfect scaling */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="glow-line-hero" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -353,19 +353,18 @@ const WorkflowVisualization = () => {
               <motion.path
                 d={path}
                 stroke={strokeColor}
-                strokeWidth={0.4}
-                strokeDasharray={isDataFlow ? "1 0.8" : "none"}
+                strokeWidth={1.5}
+                strokeDasharray={isDataFlow ? "3 2" : "none"}
                 fill="none"
                 filter="url(#glow-line-hero)"
                 markerEnd={`url(#${markerId})`}
-                vectorEffect="non-scaling-stroke"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: opacity * 0.7 }}
                 transition={{ delay: 0.2 + i * 0.05, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               />
               {/* Animated data particle */}
               <motion.circle
-                r="0.8"
+                r="1.5"
                 fill={strokeColor}
                 initial={{ opacity: 0 }}
                 animate={{

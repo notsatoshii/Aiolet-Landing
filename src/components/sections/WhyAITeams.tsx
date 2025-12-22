@@ -329,29 +329,7 @@ const SingleAgentView = () => {
       </motion.div>
 
       {/* Incoming arrows - responsive using percentages */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {[...Array(5)].map((_, i) => (
-          <motion.g key={`arrow-in-${i}`}>
-            <motion.line
-              x1="15"
-              y1={30 + i * 10}
-              x2="40"
-              y2={45 + i * 2}
-              stroke="url(#grad-in)"
-              strokeWidth="0.3"
-              vectorEffect="non-scaling-stroke"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 0.8, 0.3] }}
-              transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
-            />
-            <polygon 
-              points="40,43 40,47 43,45" 
-              fill="hsl(0 70% 50%)" 
-              opacity="0.8"
-              style={{ transform: `translateY(${i * 2}px)` }}
-            />
-          </motion.g>
-        ))}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="grad-in" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="hsl(0 70% 50%)" stopOpacity="0.3" />
@@ -365,21 +343,40 @@ const SingleAgentView = () => {
             <stop offset="0%" stopColor="hsl(142 76% 56%)" stopOpacity="1" />
             <stop offset="100%" stopColor="hsl(142 76% 56%)" stopOpacity="0.3" />
           </linearGradient>
+          <marker id="arrow-in-marker" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill="hsl(0 70% 50%)" fillOpacity="0.8" />
+          </marker>
         </defs>
+        
+        {/* Incoming arrows */}
+        {[...Array(5)].map((_, i) => (
+          <motion.line
+            key={`arrow-in-${i}`}
+            x1="15"
+            y1={30 + i * 8}
+            x2="42"
+            y2={45 + i * 2}
+            stroke="url(#grad-in)"
+            strokeWidth="1.5"
+            markerEnd="url(#arrow-in-marker)"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.4, 0.9, 0.4] }}
+            transition={{ duration: 1.5, delay: i * 0.2, repeat: Infinity }}
+          />
+        ))}
         
         {/* Outgoing arrows */}
         {[...Array(5)].map((_, i) => (
           <motion.line
             key={`arrow-out-${i}`}
-            x1="60"
+            x1="58"
             y1={45 + i * 2}
             x2="85"
-            y2={30 + i * 10}
+            y2={30 + i * 8}
             stroke={i < 1 ? "url(#grad-out-success)" : "url(#grad-out-fail)"}
-            strokeWidth="0.3"
-            vectorEffect="non-scaling-stroke"
+            strokeWidth="1.5"
             initial={{ opacity: 0 }}
-            animate={{ opacity: i < 1 ? [0.8, 1, 0.8] : [0.2, 0.5, 0.2] }}
+            animate={{ opacity: i < 1 ? [0.8, 1, 0.8] : [0.3, 0.6, 0.3] }}
             transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
           />
         ))}
@@ -531,7 +528,7 @@ const TeamAgentView = () => {
       </motion.div>
 
       {/* Command lines from Orchestrator to Leads - using viewBox for proper scaling */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ zIndex: 0 }}>
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={{ zIndex: 0 }}>
         <defs>
           <marker id="arrow-cmd-team" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
             <polygon points="0 0, 6 3, 0 6" fill="hsl(45 100% 60%)" fillOpacity="0.8" />
@@ -548,11 +545,10 @@ const TeamAgentView = () => {
                 x1="50"
                 y1="18"
                 x2={xPos}
-                y2="32"
+                y2="35"
                 stroke="hsl(45 100% 60%)"
-                strokeWidth="0.4"
-                strokeOpacity="0.6"
-                vectorEffect="non-scaling-stroke"
+                strokeWidth="1.5"
+                strokeOpacity="0.7"
                 markerEnd="url(#arrow-cmd-team)"
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: 1 }}
@@ -560,13 +556,13 @@ const TeamAgentView = () => {
               />
               {/* Animated particle */}
               <motion.circle
-                r="0.8"
+                r="2"
                 fill="hsl(45 100% 60%)"
                 initial={{ opacity: 0 }}
                 animate={{
                   opacity: [0, 1, 1, 0],
                   cx: [50, xPos],
-                  cy: [18, 32]
+                  cy: [18, 35]
                 }}
                 transition={{
                   duration: 1.5,
@@ -581,29 +577,27 @@ const TeamAgentView = () => {
 
         {/* Data flows between workers - percentage based */}
         <motion.line
-          x1="30"
-          y1="60"
-          x2="50"
-          y2="60"
+          x1="28"
+          y1="62"
+          x2="48"
+          y2="62"
           stroke="hsl(160 70% 50%)"
-          strokeWidth="0.4"
-          strokeDasharray="1.5 1"
-          strokeOpacity="0.6"
-          vectorEffect="non-scaling-stroke"
+          strokeWidth="1.5"
+          strokeDasharray="4 3"
+          strokeOpacity="0.7"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.2, duration: 0.5 }}
         />
         <motion.line
-          x1="60"
-          y1="60"
-          x2="78"
-          y2="60"
+          x1="52"
+          y1="62"
+          x2="72"
+          y2="62"
           stroke="hsl(160 70% 50%)"
-          strokeWidth="0.4"
-          strokeDasharray="1.5 1"
-          strokeOpacity="0.6"
-          vectorEffect="non-scaling-stroke"
+          strokeWidth="1.5"
+          strokeDasharray="4 3"
+          strokeOpacity="0.7"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ delay: 1.4, duration: 0.5 }}
