@@ -11,19 +11,21 @@ const Header = () => {
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.4 }}
       className="fixed top-0 left-0 right-0 z-50"
     >
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-md border-b border-border/30" />
+      <div className="absolute inset-0 bg-background/90 backdrop-blur-sm border-b border-border/40" />
       <div className="container relative">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <span className="font-heading font-bold text-xl text-gradient">aiolet</span>
+            <span className="font-heading font-semibold text-lg tracking-tight">
+              <span className="text-primary">aiolet</span>
+            </span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             <a
               href="#features"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -44,7 +46,7 @@ const Header = () => {
             </a>
           </nav>
 
-          <Button variant="hero" size="sm" onClick={scrollToWaitlist}>
+          <Button variant="default" size="sm" onClick={scrollToWaitlist}>
             Join Waitlist
           </Button>
         </div>

@@ -1,6 +1,5 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 const WhyAITeams = () => {
   const ref = useRef(null);
@@ -8,40 +7,39 @@ const WhyAITeams = () => {
   const [activeView, setActiveView] = useState<"single" | "team">("single");
 
   return (
-    <section ref={ref} className="relative py-24 lg:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background" />
+    <section ref={ref} className="relative py-24 lg:py-28 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/3 to-background" />
 
       <div className="container relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+          <h2 className="font-heading text-3xl md:text-4xl font-semibold mb-5 tracking-tight">
             Real Work Requires Teams,{" "}
-            <span className="text-gradient">Not Single Agents</span>
+            <span className="text-primary">Not Single Agents</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Single agents work for simple tasks. Real workflows don't stay simple.
-            As complexity increases, reliability drops. Aiolet solves this by letting
-            you run AI teams that behave more like real departments.
+          <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Single agents work for simple tasks. As complexity increases, reliability drops.
+            Aiolet solves this by letting you run AI teams that behave like real departments.
           </p>
         </motion.div>
 
         {/* Toggle */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex justify-center mb-12"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex justify-center mb-10"
         >
-          <div className="inline-flex rounded-xl bg-muted/30 p-1 border border-border/50">
+          <div className="inline-flex rounded-lg bg-muted/30 p-1 border border-border">
             <button
               onClick={() => setActiveView("single")}
-              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 activeView === "single"
-                  ? "bg-card text-foreground shadow-md"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -49,9 +47,9 @@ const WhyAITeams = () => {
             </button>
             <button
               onClick={() => setActiveView("team")}
-              className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                 activeView === "team"
-                  ? "bg-card text-foreground shadow-md"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -60,49 +58,31 @@ const WhyAITeams = () => {
           </div>
         </motion.div>
 
-        {/* Comparison Visualization */}
+        {/* Comparison */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={isInView ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="relative max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="relative max-w-3xl mx-auto"
         >
-          <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-8 md:p-12">
-            <div className="relative h-[300px] md:h-[350px]">
+          <div className="bg-card rounded-xl border border-border p-6 md:p-10">
+            <div className="relative h-[260px] md:h-[300px]">
               {activeView === "single" ? <SingleAgentView /> : <TeamAgentView />}
             </div>
 
-            {/* Labels */}
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
+            {/* Status Labels */}
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               {activeView === "single" ? (
                 <>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-sm">
-                    <AlertTriangle className="w-4 h-4" />
-                    Bottlenecks
-                  </span>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-sm">
-                    <AlertTriangle className="w-4 h-4" />
-                    Fragile
-                  </span>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-sm">
-                    <AlertTriangle className="w-4 h-4" />
-                    Hard to scale
-                  </span>
+                  <StatusLabel label="Bottlenecks" variant="warning" />
+                  <StatusLabel label="Fragile" variant="warning" />
+                  <StatusLabel label="Hard to scale" variant="warning" />
                 </>
               ) : (
                 <>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-sm">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Parallel
-                  </span>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-sm">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Structured
-                  </span>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-sm">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Reliable
-                  </span>
+                  <StatusLabel label="Parallel" variant="success" />
+                  <StatusLabel label="Structured" variant="success" />
+                  <StatusLabel label="Reliable" variant="success" />
                 </>
               )}
             </div>
@@ -113,33 +93,44 @@ const WhyAITeams = () => {
   );
 };
 
+const StatusLabel = ({ label, variant }: { label: string; variant: "success" | "warning" }) => {
+  const styles = variant === "success"
+    ? "bg-primary/10 text-primary border-primary/20"
+    : "bg-destructive/10 text-destructive border-destructive/20";
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-medium ${styles}`}>
+      <span className={`w-1 h-1 rounded-full ${variant === "success" ? "bg-primary" : "bg-destructive"}`} />
+      {label}
+    </span>
+  );
+};
+
 const SingleAgentView = () => {
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Central overloaded node */}
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.4 }}
         className="relative"
       >
-        <div className="w-24 h-24 rounded-full bg-destructive/20 border-2 border-destructive/50 flex items-center justify-center animate-pulse">
-          <span className="text-sm font-medium text-destructive">Agent</span>
+        {/* Central overloaded node */}
+        <div className="w-20 h-20 rounded-xl bg-destructive/10 border-2 border-destructive/40 flex items-center justify-center">
+          <span className="text-xs font-mono text-destructive">agent</span>
         </div>
         
-        {/* Warning indicator */}
-        <div className="absolute -top-1 -right-1">
-          <AlertTriangle className="w-6 h-6 text-destructive animate-pulse" />
-        </div>
+        {/* Warning pulse */}
+        <div className="absolute inset-0 rounded-xl bg-destructive/10 animate-ping" style={{ animationDuration: '2s' }} />
 
-        {/* Chaotic branches */}
-        {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+        {/* Chaotic connections */}
+        {[0, 72, 144, 216, 288].map((angle, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 + i * 0.1 }}
-            className="absolute w-16 h-0.5 bg-gradient-to-r from-destructive/50 to-transparent"
+            transition={{ delay: 0.2 + i * 0.08 }}
+            className="absolute w-12 h-px bg-gradient-to-r from-destructive/40 to-transparent"
             style={{
               transform: `rotate(${angle}deg)`,
               transformOrigin: "0 50%",
@@ -148,53 +139,36 @@ const SingleAgentView = () => {
             }}
           >
             <div 
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-destructive/30 border border-destructive/50"
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-sm bg-destructive/20 border border-destructive/40"
               style={{ transform: `rotate(-${angle}deg)` }}
             />
           </motion.div>
         ))}
       </motion.div>
-
-      {/* Background chaos lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-20">
-        {[...Array(8)].map((_, i) => (
-          <motion.path
-            key={i}
-            d={`M ${Math.random() * 100}% ${Math.random() * 100}% Q ${Math.random() * 100}% ${Math.random() * 100}%, ${Math.random() * 100}% ${Math.random() * 100}%`}
-            stroke="hsl(var(--destructive))"
-            strokeWidth="1"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1, delay: i * 0.1 }}
-          />
-        ))}
-      </svg>
     </div>
   );
 };
 
 const TeamAgentView = () => {
   const agents = [
-    { label: "Lead", x: "50%", y: "15%" },
-    { label: "Research", x: "20%", y: "45%" },
-    { label: "Create", x: "50%", y: "45%" },
-    { label: "Review", x: "80%", y: "45%" },
-    { label: "Execute", x: "50%", y: "75%" },
+    { label: "lead", x: "50%", y: "12%" },
+    { label: "research", x: "22%", y: "45%" },
+    { label: "create", x: "50%", y: "45%" },
+    { label: "review", x: "78%", y: "45%" },
+    { label: "execute", x: "50%", y: "78%" },
   ];
 
   return (
     <div className="relative w-full h-full">
-      {/* Connection lines */}
+      {/* Connections */}
       <svg className="absolute inset-0 w-full h-full">
-        {/* Lines from Lead to row 2 */}
         {[
-          { x1: "50%", y1: "22%", x2: "20%", y2: "38%" },
-          { x1: "50%", y1: "22%", x2: "50%", y2: "38%" },
-          { x1: "50%", y1: "22%", x2: "80%", y2: "38%" },
-          { x1: "20%", y1: "52%", x2: "50%", y2: "68%" },
-          { x1: "50%", y1: "52%", x2: "50%", y2: "68%" },
-          { x1: "80%", y1: "52%", x2: "50%", y2: "68%" },
+          { x1: "50%", y1: "20%", x2: "22%", y2: "38%" },
+          { x1: "50%", y1: "20%", x2: "50%", y2: "38%" },
+          { x1: "50%", y1: "20%", x2: "78%", y2: "38%" },
+          { x1: "22%", y1: "52%", x2: "50%", y2: "70%" },
+          { x1: "50%", y1: "52%", x2: "50%", y2: "70%" },
+          { x1: "78%", y1: "52%", x2: "50%", y2: "70%" },
         ].map((line, i) => (
           <motion.line
             key={i}
@@ -203,29 +177,29 @@ const TeamAgentView = () => {
             x2={line.x2}
             y2={line.y2}
             stroke="hsl(var(--primary))"
-            strokeWidth="2"
-            strokeOpacity="0.4"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
+            strokeWidth="1"
+            strokeDasharray="4 4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.3 }}
+            transition={{ duration: 0.4, delay: 0.2 + i * 0.05 }}
           />
         ))}
       </svg>
 
-      {/* Shared memory core */}
+      {/* Shared context */}
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.8, duration: 0.4 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
       >
-        <div className="w-16 h-16 rounded-full bg-secondary/10 border border-secondary/30 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full bg-secondary/20 border border-secondary/40 flex items-center justify-center">
-            <div className="w-3 h-3 rounded-full bg-secondary animate-pulse" />
+        <div className="w-12 h-12 rounded-full bg-primary/5 border border-primary/20 flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-primary/60" />
           </div>
         </div>
-        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-secondary whitespace-nowrap">
-          Shared Memory
+        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-mono text-primary/60 whitespace-nowrap">
+          context
         </span>
       </motion.div>
 
@@ -233,14 +207,14 @@ const TeamAgentView = () => {
       {agents.map((agent, i) => (
         <motion.div
           key={agent.label}
-          initial={{ scale: 0, opacity: 0 }}
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 + i * 0.1, type: "spring" }}
+          transition={{ delay: 0.1 + i * 0.08, ease: "easeOut" }}
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: agent.x, top: agent.y }}
         >
-          <div className="w-16 h-16 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center hover:border-primary/60 hover:bg-primary/20 transition-all cursor-pointer group">
-            <span className="text-xs font-medium text-foreground group-hover:text-primary transition-colors">
+          <div className="w-14 h-14 rounded-lg bg-card border border-border flex items-center justify-center hover:border-primary/40 transition-colors cursor-pointer">
+            <span className="text-[10px] font-mono text-muted-foreground">
               {agent.label}
             </span>
           </div>

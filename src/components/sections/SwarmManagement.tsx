@@ -15,40 +15,40 @@ const SwarmManagement = () => {
   ];
 
   return (
-    <section ref={ref} className="relative py-24 lg:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/5" />
-
+    <section ref={ref} className="relative py-24 lg:py-28 overflow-hidden">
       <div className="container relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           {/* Content */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold mb-5 tracking-tight">
               See Everything.{" "}
-              <span className="text-gradient">Control Everything.</span>
+              <span className="text-primary">Control Everything.</span>
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-base text-muted-foreground mb-8 leading-relaxed">
               Most AI tools stop caring once the agent is deployed.
               Aiolet is built for what happens after. Run AI teams with
               visibility, structure, and control.
             </p>
 
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {features.map((feature, index) => (
                 <motion.li
                   key={feature.label}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -16 }}
                   animate={isInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                  className="flex items-center gap-4 group"
+                  transition={{ duration: 0.4, delay: 0.2 + index * 0.08 }}
+                  className="flex items-center gap-3 group"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <feature.icon className="w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <feature.icon className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="text-foreground">{feature.label}</span>
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                    {feature.label}
+                  </span>
                 </motion.li>
               ))}
             </ul>
@@ -56,50 +56,48 @@ const SwarmManagement = () => {
 
           {/* Dashboard Mock */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
             className="relative"
           >
-            <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden shadow-2xl">
+            <div className="relative bg-card rounded-xl border border-border overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-sm font-medium">Content Team</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-sm font-mono">content_team</span>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1 text-xs rounded-md bg-muted hover:bg-muted/80 transition-colors">
-                    Pause
+                  <button className="px-2.5 py-1 text-[10px] font-mono rounded bg-muted hover:bg-muted/80 transition-colors text-muted-foreground">
+                    pause
                   </button>
-                  <button className="px-3 py-1 text-xs rounded-md bg-primary/20 text-primary hover:bg-primary/30 transition-colors">
-                    Override
+                  <button className="px-2.5 py-1 text-[10px] font-mono rounded bg-primary/15 text-primary hover:bg-primary/25 transition-colors">
+                    override
                   </button>
                 </div>
               </div>
 
-              {/* Team Graph Mini */}
-              <div className="p-6 border-b border-border/30">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                    Team Structure
-                  </span>
-                </div>
-                <div className="relative h-24 bg-muted/10 rounded-lg p-4">
-                  <div className="flex items-center justify-between h-full">
-                    {["Research", "Write", "Review", "Post"].map((agent, i) => (
+              {/* Team Structure */}
+              <div className="p-4 border-b border-border">
+                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                  structure
+                </span>
+                <div className="relative h-16 mt-3">
+                  <div className="flex items-center justify-between h-full px-4">
+                    {["research", "write", "review", "post"].map((agent, i) => (
                       <motion.div
                         key={agent}
-                        initial={{ scale: 0 }}
-                        animate={isInView ? { scale: 1 } : {}}
-                        transition={{ delay: 0.5 + i * 0.1 }}
-                        className="relative"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                        transition={{ delay: 0.4 + i * 0.08 }}
+                        className="relative flex flex-col items-center"
                       >
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
-                          <span className="text-[10px] font-medium">{agent}</span>
+                        <div className="w-10 h-10 rounded-md bg-background border border-border flex items-center justify-center">
+                          <span className="text-[9px] font-mono text-muted-foreground">{agent}</span>
                         </div>
                         {i < 3 && (
-                          <div className="absolute top-1/2 -right-6 w-4 h-0.5 bg-primary/30" />
+                          <div className="absolute top-1/2 -right-6 w-3 h-px bg-border" />
                         )}
                       </motion.div>
                     ))}
@@ -108,53 +106,52 @@ const SwarmManagement = () => {
               </div>
 
               {/* Activity Feed */}
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Activity className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                    Live Activity
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Activity className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                    activity
                   </span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {[
-                    { agent: "Research", action: "Completed keyword analysis", time: "2s ago", status: "success" },
-                    { agent: "Write", action: "Generating draft...", time: "now", status: "active" },
-                    { agent: "Review", action: "Waiting for input", time: "-", status: "pending" },
+                    { agent: "research", action: "completed keyword analysis", time: "2s", status: "done" },
+                    { agent: "write", action: "generating draft...", time: "now", status: "active" },
+                    { agent: "review", action: "waiting", time: "-", status: "pending" },
                   ].map((log, i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ delay: 0.7 + i * 0.1 }}
-                      className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/10 hover:bg-muted/20 transition-colors"
+                      transition={{ delay: 0.6 + i * 0.08 }}
+                      className="flex items-center justify-between py-2 px-2.5 rounded-md bg-background/50"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <div
-                          className={`w-2 h-2 rounded-full ${
-                            log.status === "success"
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            log.status === "done"
                               ? "bg-green-500"
                               : log.status === "active"
-                              ? "bg-secondary animate-pulse"
-                              : "bg-muted-foreground"
+                              ? "bg-primary animate-pulse"
+                              : "bg-muted-foreground/50"
                           }`}
                         />
-                        <span className="text-xs font-medium text-primary">
+                        <span className="text-[10px] font-mono text-primary">
                           {log.agent}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-[10px] text-muted-foreground">
                           {log.action}
                         </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">{log.time}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground">{log.time}</span>
                     </motion.div>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Decorative layers */}
-            <div className="absolute -inset-4 bg-primary/5 rounded-3xl blur-2xl -z-10" />
-            <div className="absolute inset-0 -translate-x-3 -translate-y-3 bg-card/30 rounded-2xl border border-border/20 -z-20" />
+            {/* Subtle depth */}
+            <div className="absolute inset-0 -translate-x-2 -translate-y-2 bg-muted/20 rounded-xl border border-border -z-10" />
           </motion.div>
         </div>
       </div>
