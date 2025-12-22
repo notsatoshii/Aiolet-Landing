@@ -1,11 +1,12 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Eye, Activity, History, Settings, Power } from "lucide-react";
 import { SciFiPanel, DataDisplay } from "@/components/ui/scifi-panel";
 
 const SwarmManagement = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [selectedLog, setSelectedLog] = useState<number>(0);
 
   const features = [
     { icon: Eye, label: "Visual team structure" },
@@ -13,6 +14,45 @@ const SwarmManagement = () => {
     { icon: History, label: "Version history" },
     { icon: Settings, label: "Manual overrides" },
     { icon: Power, label: "Kill switch" },
+  ];
+
+  const logs = [
+    { 
+      agent: "RSRCH", 
+      action: "Keyword analysis complete", 
+      time: "2s", 
+      status: "done",
+      details: {
+        input: "Topic: AI automation trends 2025",
+        output: "Found 12 high-value keywords, avg. volume 8.2k",
+        tokens: 1847,
+        duration: "1.8s"
+      }
+    },
+    { 
+      agent: "WRITE", 
+      action: "Generating draft...", 
+      time: "now", 
+      status: "active",
+      details: {
+        input: "Keywords + outline from RSRCH",
+        output: "Draft in progress (68% complete)",
+        tokens: 2340,
+        duration: "3.2s"
+      }
+    },
+    { 
+      agent: "REVW", 
+      action: "Queued", 
+      time: "-", 
+      status: "pending",
+      details: {
+        input: "Awaiting draft from WRITE",
+        output: "—",
+        tokens: 0,
+        duration: "—"
+      }
+    },
   ];
 
   return (
@@ -94,63 +134,28 @@ const SwarmManagement = () => {
                   <DataDisplay label="Latency" value="120ms" trend="neutral" />
                 </div>
 
-                {/* Team Structure */}
+                {/* Team Structure - Updated to match hero style */}
                 <div className="mb-5">
                   <span className="text-[9px] font-mono text-primary/60 uppercase tracking-widest mb-3 block">
                     › Structure
                   </span>
-                  <div className="relative h-16 bg-background/50 border border-primary/20">
+                  <div className="relative bg-background/50 border border-primary/20 p-3">
                     <div className="absolute inset-0 bg-grid-fine opacity-30" />
                     
-                    {/* Connection lines SVG */}
-                    <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                      <defs>
-                        <marker id="arrow-sm" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="hsl(var(--primary))" fillOpacity="0.5" />
-                        </marker>
-                      </defs>
-                      {[0, 1, 2].map((i) => (
-                        <motion.line
-                          key={i}
-                          x1={`${12.5 + i * 25 + 5}%`}
-                          y1="50%"
-                          x2={`${12.5 + (i + 1) * 25 - 5}%`}
-                          y2="50%"
-                          stroke="hsl(var(--primary))"
-                          strokeWidth="1"
-                          markerEnd="url(#arrow-sm)"
-                          initial={{ opacity: 0 }}
-                          animate={isInView ? { opacity: 0.5 } : {}}
-                          transition={{ delay: 0.5 + i * 0.1 }}
-                        />
-                      ))}
-                    </svg>
-                    
-                    <div className="relative flex items-center justify-around h-full px-4">
-                      {["RSRCH", "WRITE", "REVW", "POST"].map((agent, i) => (
-                        <motion.div
-                          key={agent}
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={isInView ? { scale: 1, opacity: 1 } : {}}
-                          transition={{ delay: 0.4 + i * 0.08 }}
-                          className="relative"
-                        >
-                          <div 
-                            className="w-9 h-9 bg-card border border-primary/40 flex items-center justify-center"
-                            style={{ boxShadow: '0 0 10px hsl(var(--primary) / 0.15)' }}
-                          >
-                            {/* Corner accents */}
-                            <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t border-primary" />
-                            <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t border-primary" />
-                            <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b border-primary" />
-                            <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b border-primary" />
-                            
-                            <span className="text-[7px] font-mono text-primary tracking-wider">{agent}</span>
-                          </div>
-                          {/* Status dot */}
-                          <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background" 
-                               style={{ boxShadow: '0 0 4px #4ade80' }} />
-                        </motion.div>
+                    {/* Workflow nodes with CSS-based connectors */}
+                    <div className="relative flex items-center justify-around">
+                      {["RSRCH", "WRITE", "REVW", "POST"].map((agent, i, arr) => (
+                        <div key={agent} className="flex items-center">
+                          <StructureNode label={agent} isInView={isInView} delay={0.4 + i * 0.08} />
+                          {i < arr.length - 1 && (
+                            <motion.div 
+                              className="w-4 sm:w-6 h-px bg-primary/50 mx-1"
+                              initial={{ scaleX: 0 }}
+                              animate={isInView ? { scaleX: 1 } : {}}
+                              transition={{ delay: 0.5 + i * 0.1, duration: 0.3 }}
+                            />
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -164,18 +169,19 @@ const SwarmManagement = () => {
                       Activity
                     </span>
                   </div>
-                  <div className="space-y-2">
-                    {[
-                      { agent: "RSRCH", action: "Keyword analysis complete", time: "2s", status: "done" },
-                      { agent: "WRITE", action: "Generating draft...", time: "now", status: "active" },
-                      { agent: "REVW", action: "Queued", time: "-", status: "pending" },
-                    ].map((log, i) => (
+                  <div className="space-y-1.5">
+                    {logs.map((log, i) => (
                       <motion.div
                         key={i}
                         initial={{ opacity: 0, y: 8 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.6 + i * 0.08 }}
-                        className="flex items-center justify-between py-2 px-2.5 bg-background/50 border border-primary/10"
+                        onClick={() => setSelectedLog(i)}
+                        className={`flex items-center justify-between py-2 px-2.5 border cursor-pointer transition-all ${
+                          selectedLog === i 
+                            ? 'bg-primary/10 border-primary/40' 
+                            : 'bg-background/50 border-primary/10 hover:border-primary/30'
+                        }`}
                       >
                         <div className="flex items-center gap-2">
                           <div
@@ -199,6 +205,59 @@ const SwarmManagement = () => {
                       </motion.div>
                     ))}
                   </div>
+                  
+                  {/* Log Detail Panel */}
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-3 border border-primary/30 bg-card/80"
+                  >
+                    <div className="p-3">
+                      <div className="flex items-center justify-between mb-2 pb-2 border-b border-primary/20">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 ${
+                            logs[selectedLog].status === "done" ? "bg-green-400" :
+                            logs[selectedLog].status === "active" ? "bg-primary animate-pulse" :
+                            "bg-muted-foreground/50"
+                          }`} />
+                          <span className="text-[10px] font-mono text-primary uppercase tracking-wider">
+                            {logs[selectedLog].agent} Details
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-mono text-muted-foreground">
+                          {logs[selectedLog].details.duration}
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-[9px]">
+                        <div>
+                          <span className="font-mono text-primary/60 uppercase block mb-1">Input</span>
+                          <span className="text-muted-foreground">{logs[selectedLog].details.input}</span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-primary/60 uppercase block mb-1">Output</span>
+                          <span className="text-muted-foreground">{logs[selectedLog].details.output}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-4 mt-2 pt-2 border-t border-primary/10">
+                        <div className="flex items-center gap-1">
+                          <span className="text-[8px] font-mono text-primary/50 uppercase">Tokens:</span>
+                          <span className="text-[9px] font-mono text-primary">{logs[selectedLog].details.tokens}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[8px] font-mono text-primary/50 uppercase">Status:</span>
+                          <span className={`text-[9px] font-mono ${
+                            logs[selectedLog].status === "done" ? "text-green-400" :
+                            logs[selectedLog].status === "active" ? "text-primary" :
+                            "text-muted-foreground"
+                          }`}>
+                            {logs[selectedLog].status.toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </SciFiPanel>
@@ -206,6 +265,42 @@ const SwarmManagement = () => {
         </div>
       </div>
     </section>
+  );
+};
+
+// Node component matching the hero section style
+const StructureNode = ({ label, isInView, delay }: { label: string; isInView: boolean; delay: number }) => {
+  const tierColor = "hsl(var(--primary))";
+  
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={isInView ? { scale: 1, opacity: 1 } : {}}
+      transition={{ delay, duration: 0.3 }}
+      className="relative group"
+    >
+      <div 
+        className="relative w-8 h-8 sm:w-10 sm:h-10 bg-card border flex items-center justify-center cursor-pointer transition-all group-hover:bg-primary/10"
+        style={{
+          borderColor: tierColor,
+          boxShadow: `0 0 8px hsl(var(--primary) / 0.2)`
+        }}
+      >
+        {/* Corner accents */}
+        <div className="absolute -top-px -left-px w-1.5 h-1.5 border-l border-t border-primary" />
+        <div className="absolute -top-px -right-px w-1.5 h-1.5 border-r border-t border-primary" />
+        <div className="absolute -bottom-px -left-px w-1.5 h-1.5 border-l border-b border-primary" />
+        <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-r border-b border-primary" />
+        
+        {/* Status indicator */}
+        <div 
+          className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 border border-background" 
+          style={{ boxShadow: '0 0 4px #4ade80' }} 
+        />
+        
+        <span className="text-[7px] sm:text-[8px] font-mono text-primary tracking-wider">{label}</span>
+      </div>
+    </motion.div>
   );
 };
 
