@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Eye, Activity, History, Settings, Power } from "lucide-react";
+import { SciFiPanel, DataDisplay } from "@/components/ui/scifi-panel";
 
 const SwarmManagement = () => {
   const ref = useRef(null);
@@ -8,14 +9,17 @@ const SwarmManagement = () => {
 
   const features = [
     { icon: Eye, label: "Visual team structure" },
-    { icon: Activity, label: "Activity logs and outputs" },
-    { icon: History, label: "Version history and updates" },
+    { icon: Activity, label: "Activity logs & outputs" },
+    { icon: History, label: "Version history" },
     { icon: Settings, label: "Manual overrides" },
     { icon: Power, label: "Kill switch" },
   ];
 
   return (
     <section ref={ref} className="relative py-24 lg:py-28 overflow-hidden">
+      <div className="absolute inset-0 bg-grid opacity-20" />
+      <div className="absolute inset-0 noise-overlay" />
+
       <div className="container relative z-10">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           {/* Content */}
@@ -24,14 +28,18 @@ const SwarmManagement = () => {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="font-heading text-3xl md:text-4xl font-semibold mb-5 tracking-tight">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-primary/10 border border-primary/30 text-primary text-[10px] font-mono uppercase tracking-widest mb-6">
+              <span className="w-1 h-1 bg-primary" />
+              Control Plane
+            </div>
+            
+            <h2 className="font-heading text-2xl md:text-3xl font-medium mb-5 tracking-wider">
               See Everything.{" "}
-              <span className="text-primary">Control Everything.</span>
+              <span className="text-primary" style={{ textShadow: '0 0 30px hsl(var(--primary) / 0.5)' }}>Control Everything.</span>
             </h2>
-            <p className="text-base text-muted-foreground mb-8 leading-relaxed">
-              Most AI tools stop caring once the agent is deployed.
-              Aiolet is built for what happens after. Run AI teams with
-              visibility, structure, and control.
+            <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+              Most AI tools stop caring once deployed. Aiolet is built for what happens after. 
+              Full visibility, structure, and control.
             </p>
 
             <ul className="space-y-3">
@@ -43,10 +51,10 @@ const SwarmManagement = () => {
                   transition={{ duration: 0.4, delay: 0.2 + index * 0.08 }}
                   className="flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                  <div className="relative w-8 h-8 bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/50 transition-all">
                     <feature.icon className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors font-mono uppercase tracking-wide text-[11px]">
                     {feature.label}
                   </span>
                 </motion.li>
@@ -61,97 +69,106 @@ const SwarmManagement = () => {
             transition={{ duration: 0.5, delay: 0.15 }}
             className="relative"
           >
-            <div className="relative bg-card rounded-xl border border-border overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-sm font-mono">content_team</span>
+            <SciFiPanel glowing label="System Monitor">
+              <div className="p-5">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-5 pb-3 border-b border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 bg-green-400" style={{ boxShadow: '0 0 8px #4ade80' }} />
+                    <span className="text-xs font-mono uppercase tracking-widest">content_team</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="px-2.5 py-1 text-[9px] font-mono uppercase tracking-widest bg-muted border border-border hover:border-primary/30 transition-colors">
+                      Pause
+                    </button>
+                    <button className="px-2.5 py-1 text-[9px] font-mono uppercase tracking-widest bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-colors">
+                      Override
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="px-2.5 py-1 text-[10px] font-mono rounded bg-muted hover:bg-muted/80 transition-colors text-muted-foreground">
-                    pause
-                  </button>
-                  <button className="px-2.5 py-1 text-[10px] font-mono rounded bg-primary/15 text-primary hover:bg-primary/25 transition-colors">
-                    override
-                  </button>
-                </div>
-              </div>
 
-              {/* Team Structure */}
-              <div className="p-4 border-b border-border">
-                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                  structure
-                </span>
-                <div className="relative h-16 mt-3">
-                  <div className="flex items-center justify-between h-full px-4">
-                    {["research", "write", "review", "post"].map((agent, i) => (
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-4 mb-5 pb-5 border-b border-primary/20">
+                  <DataDisplay label="Tasks/hr" value="847" trend="up" />
+                  <DataDisplay label="Success" value="99.2%" trend="up" />
+                  <DataDisplay label="Latency" value="120ms" trend="neutral" />
+                </div>
+
+                {/* Team Structure */}
+                <div className="mb-5">
+                  <span className="text-[9px] font-mono text-primary/60 uppercase tracking-widest mb-3 block">
+                    › Structure
+                  </span>
+                  <div className="relative h-14 bg-background/50 border border-primary/20">
+                    <div className="absolute inset-0 bg-grid-fine opacity-30" />
+                    <div className="relative flex items-center justify-between h-full px-4">
+                      {["RSRCH", "WRITE", "REVW", "POST"].map((agent, i) => (
+                        <motion.div
+                          key={agent}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={isInView ? { scale: 1, opacity: 1 } : {}}
+                          transition={{ delay: 0.4 + i * 0.08 }}
+                          className="relative flex flex-col items-center"
+                        >
+                          <div className="w-9 h-9 bg-card border border-primary/40 flex items-center justify-center"
+                               style={{ boxShadow: '0 0 10px hsl(var(--primary) / 0.15)' }}>
+                            <span className="text-[8px] font-mono text-primary tracking-wider">{agent}</span>
+                          </div>
+                          {i < 3 && (
+                            <div className="absolute top-1/2 -right-4 w-2 h-px bg-primary/40" />
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Activity Feed */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity className="w-3 h-3 text-primary/60" />
+                    <span className="text-[9px] font-mono text-primary/60 uppercase tracking-widest">
+                      Activity
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { agent: "RSRCH", action: "Keyword analysis complete", time: "2s", status: "done" },
+                      { agent: "WRITE", action: "Generating draft...", time: "now", status: "active" },
+                      { agent: "REVW", action: "Queued", time: "-", status: "pending" },
+                    ].map((log, i) => (
                       <motion.div
-                        key={agent}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={isInView ? { scale: 1, opacity: 1 } : {}}
-                        transition={{ delay: 0.4 + i * 0.08 }}
-                        className="relative flex flex-col items-center"
+                        key={i}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ delay: 0.6 + i * 0.08 }}
+                        className="flex items-center justify-between py-2 px-2.5 bg-background/50 border border-primary/10"
                       >
-                        <div className="w-10 h-10 rounded-md bg-background border border-border flex items-center justify-center">
-                          <span className="text-[9px] font-mono text-muted-foreground">{agent}</span>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-1.5 h-1.5 ${
+                              log.status === "done"
+                                ? "bg-green-400"
+                                : log.status === "active"
+                                ? "bg-primary animate-pulse"
+                                : "bg-muted-foreground/50"
+                            }`}
+                            style={log.status === "done" ? { boxShadow: '0 0 6px #4ade80' } : log.status === "active" ? { boxShadow: '0 0 6px hsl(var(--primary))' } : {}}
+                          />
+                          <span className="text-[9px] font-mono text-primary tracking-wider">
+                            {log.agent}
+                          </span>
+                          <span className="text-[9px] text-muted-foreground">
+                            {log.action}
+                          </span>
                         </div>
-                        {i < 3 && (
-                          <div className="absolute top-1/2 -right-6 w-3 h-px bg-border" />
-                        )}
+                        <span className="text-[9px] font-mono text-muted-foreground">{log.time}</span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
               </div>
-
-              {/* Activity Feed */}
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Activity className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                    activity
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {[
-                    { agent: "research", action: "completed keyword analysis", time: "2s", status: "done" },
-                    { agent: "write", action: "generating draft...", time: "now", status: "active" },
-                    { agent: "review", action: "waiting", time: "-", status: "pending" },
-                  ].map((log, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ delay: 0.6 + i * 0.08 }}
-                      className="flex items-center justify-between py-2 px-2.5 rounded-md bg-background/50"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            log.status === "done"
-                              ? "bg-green-500"
-                              : log.status === "active"
-                              ? "bg-primary animate-pulse"
-                              : "bg-muted-foreground/50"
-                          }`}
-                        />
-                        <span className="text-[10px] font-mono text-primary">
-                          {log.agent}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {log.action}
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-muted-foreground">{log.time}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Subtle depth */}
-            <div className="absolute inset-0 -translate-x-2 -translate-y-2 bg-muted/20 rounded-xl border border-border -z-10" />
+            </SciFiPanel>
           </motion.div>
         </div>
       </div>

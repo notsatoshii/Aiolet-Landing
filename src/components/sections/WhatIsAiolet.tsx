@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Terminal, Boxes, Activity } from "lucide-react";
+import { SciFiCard } from "@/components/ui/scifi-panel";
 
 const WhatIsAiolet = () => {
   const ref = useRef(null);
@@ -11,29 +12,32 @@ const WhatIsAiolet = () => {
     {
       icon: Terminal,
       title: "Build",
+      tag: "INPUT → STRUCTURE",
       description:
-        "Describe your workflow in plain English. Aiolet generates the agents, tools, and logic for you.",
-      tag: "input → structure",
+        "Describe your workflow in plain English. Aiolet generates the agents, tools, and logic.",
     },
     {
       icon: Boxes,
       title: "Run",
+      tag: "ORCHESTRATION",
       description:
-        "Organize agents into real teams with roles, shared memory, and parallel execution.",
-      tag: "orchestration",
+        "Organize agents into teams with roles, shared memory, and parallel execution.",
     },
     {
       icon: Activity,
       title: "Scale",
+      tag: "OBSERVABILITY",
       description:
-        "Monitor performance, update behavior, and expand without rebuilding from scratch.",
-      tag: "observability",
+        "Monitor performance, update behavior, and expand without rebuilding.",
     },
   ];
 
   return (
     <section ref={ref} id="features" className="relative py-24 lg:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-grid-fine opacity-30" />
+      {/* Background */}
+      <div className="absolute inset-0 bg-grid opacity-30" />
+      <div className="absolute inset-0 bg-hex-grid opacity-20" />
+      <div className="absolute inset-0 noise-overlay" />
 
       <div className="container relative z-10">
         <motion.div
@@ -42,17 +46,21 @@ const WhatIsAiolet = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-semibold mb-5 tracking-tight">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-primary/10 border border-primary/30 text-primary text-[10px] font-mono uppercase tracking-widest mb-6">
+            <span className="w-1 h-1 bg-primary" />
+            Core Functions
+          </div>
+          
+          <h2 className="font-heading text-2xl md:text-3xl font-medium mb-5 tracking-wider">
             Build, Run, and Scale{" "}
-            <span className="text-primary">AI Teams</span>
+            <span className="text-primary" style={{ textShadow: '0 0 30px hsl(var(--primary) / 0.5)' }}>AI Teams</span>
           </h2>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Aiolet is an AI workspace for people who already use AI but are blocked by scale.
-            Describe what you want in plain English. Aiolet turns it into a working system of
-            AI agents that collaborate, share context, and run reliably.
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            An AI workspace for those blocked by scale. Describe what you want. 
+            Get a working system of agents that collaborate and run reliably.
           </p>
-          <p className="text-primary font-medium mt-4 text-sm font-mono">
-            No code. No prompt juggling. No chaos.
+          <p className="text-primary font-mono text-xs mt-4 tracking-widest uppercase">
+            No code. No chaos.
           </p>
         </motion.div>
 
@@ -64,29 +72,31 @@ const WhatIsAiolet = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
             >
-              <div className="group relative h-full bg-card rounded-xl border border-border p-6 hover:border-primary/30 transition-all duration-300">
-                {/* Tag */}
-                <span className="inline-block text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-4">
-                  {card.tag}
-                </span>
+              <SciFiCard>
+                <div className="p-6">
+                  {/* Tag */}
+                  <span className="inline-block text-[9px] font-mono text-primary/60 uppercase tracking-widest mb-4">
+                    {card.tag}
+                  </span>
 
-                {/* Icon */}
-                <div className="mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors duration-300">
-                    <card.icon className="w-5 h-5 text-primary" />
+                  {/* Icon */}
+                  <div className="mb-4">
+                    <div className="relative w-12 h-12">
+                      <div className="absolute inset-0 bg-primary/20 blur-lg" />
+                      <div className="relative w-full h-full bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <card.icon className="w-5 h-5 text-primary" />
+                      </div>
+                    </div>
                   </div>
+
+                  <h3 className="font-heading text-lg font-medium mb-2 tracking-wider uppercase">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {card.description}
+                  </p>
                 </div>
-
-                <h3 className="font-heading text-lg font-medium mb-2">
-                  {card.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {card.description}
-                </p>
-
-                {/* Subtle indicator */}
-                <div className="absolute bottom-6 right-6 w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary/50 transition-colors duration-300" />
-              </div>
+              </SciFiCard>
             </motion.div>
           ))}
         </div>
