@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Hexagon } from "lucide-react";
+import logoWhite from "@/assets/logo-white.png";
 
 const Header = () => {
   const scrollToWaitlist = () => {
@@ -24,10 +24,14 @@ const Header = () => {
       <div className="container relative">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <Hexagon className="w-5 h-5 text-primary" style={{ filter: 'drop-shadow(0 0 6px hsl(var(--primary)))' }} />
-            <span className="font-heading text-sm tracking-[0.2em] uppercase">
-              <span className="text-primary">Aiolet</span>
-            </span>
+            <img 
+              src={logoWhite} 
+              alt="Aiolet Logo" 
+              className="h-6 w-auto"
+              style={{ 
+                filter: 'brightness(0) saturate(100%) invert(74%) sepia(52%) saturate(505%) hue-rotate(130deg) brightness(92%) contrast(91%) drop-shadow(0 0 8px hsl(185 80% 55% / 0.6))'
+              }} 
+            />
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
