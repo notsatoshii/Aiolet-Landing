@@ -3,10 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Terminal, Hexagon } from "lucide-react";
 import { SciFiPanel } from "@/components/ui/scifi-panel";
+import WaitlistDialog from "@/components/WaitlistDialog";
 
 const HeroSection = () => {
   const [showWorkflow, setShowWorkflow] = useState(false);
   const [typedText, setTypedText] = useState("");
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const fullText = "Build me a content team that researches, writes, reviews, and posts daily.";
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -138,7 +140,12 @@ const HeroSection = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
             >
-              <Button variant="hero" size="lg" className="group uppercase tracking-wider">
+              <Button 
+                variant="hero" 
+                size="lg" 
+                className="group uppercase tracking-wider"
+                onClick={() => setWaitlistOpen(true)}
+              >
                 <span>Join Waitlist</span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
               </Button>
@@ -146,6 +153,8 @@ const HeroSection = () => {
                 Learn More
               </Button>
             </motion.div>
+            
+            <WaitlistDialog open={waitlistOpen} onOpenChange={setWaitlistOpen} />
           </motion.div>
 
           {/* Right: Interactive Demo with parallax depth */}
