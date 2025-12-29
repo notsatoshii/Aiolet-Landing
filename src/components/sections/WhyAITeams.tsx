@@ -84,7 +84,7 @@ const WhyAITeams = () => {
         >
           <SciFiPanel label={activeView === "single" ? "Single Agent Mode — Bottleneck" : "Team Mode — Parallel Execution"}>
             <div className="p-6 md:p-8">
-              <div className="relative h-[420px] md:h-[480px]">
+              <div className="relative h-[380px] sm:h-[420px] md:h-[480px]">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeView}
@@ -225,19 +225,19 @@ const SingleAgentView = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
-        className="absolute top-0 left-0 bg-card/80 border border-red-500/30 p-4"
+        className="absolute top-0 left-0 bg-card/80 border border-red-500/30 p-2 sm:p-4 z-20"
       >
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Performance</div>
+        <div className="text-[8px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">Performance</div>
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-mono text-red-400">{completedCount}</span>
-          <span className="text-lg font-mono text-muted-foreground">/10</span>
+          <span className="text-xl sm:text-2xl font-mono text-red-400">{completedCount}</span>
+          <span className="text-base sm:text-lg font-mono text-muted-foreground">/10</span>
         </div>
-        <div className="text-[10px] font-mono text-red-400 mt-1">
+        <div className="text-[8px] sm:text-[10px] font-mono text-red-400 mt-1">
           {failedCount} FAILED
         </div>
         
         {/* Stalling progress bar */}
-        <div className="mt-3 w-32 h-1.5 bg-muted/30 border border-red-500/20">
+        <div className="mt-2 sm:mt-3 w-20 sm:w-32 h-1 sm:h-1.5 bg-muted/30 border border-red-500/20">
           <motion.div 
             className="h-full bg-red-500"
             initial={{ width: 0 }}
@@ -245,7 +245,7 @@ const SingleAgentView = () => {
             transition={{ duration: 0.3 }}
           />
         </div>
-        <div className="text-[9px] font-mono text-red-400/70 mt-1">STALLED</div>
+        <div className="text-[7px] sm:text-[9px] font-mono text-red-400/70 mt-1">STALLED</div>
       </motion.div>
 
       {/* Central Agent */}
@@ -258,7 +258,7 @@ const SingleAgentView = () => {
         >
           {/* Stress glow */}
           <motion.div 
-            className="absolute -inset-8 bg-red-500/30 blur-2xl rounded-full"
+            className="absolute -inset-4 sm:-inset-8 bg-red-500/30 blur-xl sm:blur-2xl rounded-full"
             animate={{ 
               opacity: [0.3, 0.6, 0.3],
               scale: [1, 1.1, 1]
@@ -267,28 +267,28 @@ const SingleAgentView = () => {
           />
           
           {/* Agent box */}
-          <div className="relative w-28 h-28 bg-card border-2 border-red-500 flex flex-col items-center justify-center">
-            <div className="absolute -top-1 -left-1 w-4 h-4 border-l-2 border-t-2 border-red-500" />
-            <div className="absolute -top-1 -right-1 w-4 h-4 border-r-2 border-t-2 border-red-500" />
-            <div className="absolute -bottom-1 -left-1 w-4 h-4 border-l-2 border-b-2 border-red-500" />
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 border-r-2 border-b-2 border-red-500" />
+          <div className="relative w-20 h-20 sm:w-28 sm:h-28 bg-card border-2 border-red-500 flex flex-col items-center justify-center">
+            <div className="absolute -top-1 -left-1 w-3 h-3 sm:w-4 sm:h-4 border-l-2 border-t-2 border-red-500" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 border-r-2 border-t-2 border-red-500" />
+            <div className="absolute -bottom-1 -left-1 w-3 h-3 sm:w-4 sm:h-4 border-l-2 border-b-2 border-red-500" />
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 border-r-2 border-b-2 border-red-500" />
             
             <motion.div
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ duration: 0.5, repeat: Infinity }}
-              className="text-xs font-mono text-red-400 uppercase tracking-widest"
+              className="text-[10px] sm:text-xs font-mono text-red-400 uppercase tracking-widest"
             >
               AGENT
             </motion.div>
-            <div className="text-[10px] font-mono text-red-500/70 mt-1">OVERLOADED</div>
+            <div className="text-[8px] sm:text-[10px] font-mono text-red-500/70 mt-1">OVERLOADED</div>
             
             {/* Stress indicator */}
             <motion.div 
-              className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-red-500/20 border border-red-500/50"
+              className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-1.5 sm:px-2 py-0.5 bg-red-500/20 border border-red-500/50"
               animate={{ opacity: [1, 0.6, 1] }}
               transition={{ duration: 0.8, repeat: Infinity }}
             >
-              <span className="text-[8px] font-mono text-red-400">CPU 100%</span>
+              <span className="text-[7px] sm:text-[8px] font-mono text-red-400">CPU 100%</span>
             </motion.div>
           </div>
         </motion.div>
@@ -299,12 +299,12 @@ const SingleAgentView = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
-        className="absolute left-8 top-1/2 -translate-y-1/2"
+        className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2"
       >
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-3">
-          Task Queue
+        <div className="text-[8px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 sm:mb-3">
+          Queue
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1 sm:gap-1.5">
           {tasksState.slice(0, 5).map((task, i) => (
             <TaskBlock key={task.id} index={i} status={task.status} />
           ))}
@@ -316,12 +316,12 @@ const SingleAgentView = () => {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
-        className="absolute right-8 top-1/2 -translate-y-1/2"
+        className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2"
       >
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-3">
+        <div className="text-[8px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 sm:mb-3">
           Results
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1 sm:gap-1.5">
           {tasksState.slice(5).map((task, i) => (
             <TaskBlock key={task.id} index={i + 5} status={task.status} side="right" />
           ))}
@@ -420,10 +420,10 @@ const TaskBlock = ({ index, status, side = 'left' }: { index: number; status: st
       initial={{ opacity: 0, x: side === 'left' ? -10 : 10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.08 }}
-      className={`w-16 h-7 border flex items-center justify-center gap-1 ${getStatusStyle()}`}
+      className={`w-12 h-5 sm:w-16 sm:h-7 border flex items-center justify-center gap-0.5 sm:gap-1 ${getStatusStyle()}`}
     >
-      <span className="text-[9px]">{getStatusIcon()}</span>
-      <span className="text-[9px] font-mono">T{index + 1}</span>
+      <span className="text-[7px] sm:text-[9px]">{getStatusIcon()}</span>
+      <span className="text-[7px] sm:text-[9px] font-mono">T{index + 1}</span>
     </motion.div>
   );
 };
@@ -486,18 +486,18 @@ const TeamAgentView = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
-        className="absolute top-0 left-0 bg-card/80 border border-green-500/30 p-4 z-10"
+        className="absolute top-0 left-0 bg-card/80 border border-green-500/30 p-2 sm:p-4 z-10"
       >
-        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">Performance</div>
+        <div className="text-[8px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">Performance</div>
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-mono text-green-400">{completedCount}</span>
-          <span className="text-lg font-mono text-muted-foreground">/10</span>
+          <span className="text-xl sm:text-2xl font-mono text-green-400">{completedCount}</span>
+          <span className="text-base sm:text-lg font-mono text-muted-foreground">/10</span>
         </div>
-        <div className="text-[10px] font-mono text-green-400 mt-1">
+        <div className="text-[8px] sm:text-[10px] font-mono text-green-400 mt-1">
           0 FAILED
         </div>
         
-        <div className="mt-3 w-32 h-1.5 bg-muted/30 border border-green-500/20">
+        <div className="mt-2 sm:mt-3 w-20 sm:w-32 h-1 sm:h-1.5 bg-muted/30 border border-green-500/20">
           <motion.div 
             className="h-full bg-green-500"
             initial={{ width: 0 }}
@@ -505,7 +505,7 @@ const TeamAgentView = () => {
             transition={{ duration: 0.3 }}
           />
         </div>
-        <div className="text-[9px] font-mono text-green-400/70 mt-1">OPTIMAL</div>
+        <div className="text-[7px] sm:text-[9px] font-mono text-green-400/70 mt-1">OPTIMAL</div>
       </motion.div>
 
       {/* Main content area with flexbox layout */}
@@ -698,9 +698,9 @@ const AgentNode = ({
   status?: 'idle' | 'active' | 'complete';
 }) => {
   const sizeClasses = {
-    sm: 'w-14 h-10 text-[8px]',
-    md: 'w-16 h-11 text-[9px]',
-    lg: 'w-24 h-12 text-[10px]'
+    sm: 'w-10 h-7 sm:w-14 sm:h-10 text-[6px] sm:text-[8px]',
+    md: 'w-12 h-8 sm:w-16 sm:h-11 text-[7px] sm:text-[9px]',
+    lg: 'w-16 h-9 sm:w-24 sm:h-12 text-[8px] sm:text-[10px]'
   };
 
   const statusColors = {

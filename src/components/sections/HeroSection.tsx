@@ -243,7 +243,7 @@ const HeroSection = () => {
 
 const WorkflowVisualization = () => {
   return (
-    <div className="relative w-full h-[160px]">
+    <div className="relative w-full h-[140px] sm:h-[160px]">
       <div className="absolute inset-0 bg-grid-fine opacity-30" />
       
       {/* Grid-based layout for perfect alignment */}
@@ -255,7 +255,7 @@ const WorkflowVisualization = () => {
         </div>
 
         {/* Connector: Orchestrator to Managers */}
-        <div className="w-full flex justify-center relative h-5">
+        <div className="w-full flex justify-center relative h-4 sm:h-5">
           {/* Vertical line from orchestrator */}
           <motion.div 
             className="absolute top-0 left-1/2 w-px h-1/2 bg-primary/50"
@@ -265,20 +265,20 @@ const WorkflowVisualization = () => {
           />
           {/* Horizontal bar */}
           <motion.div 
-            className="absolute top-1/2 left-1/4 w-1/2 h-px bg-primary/50"
+            className="absolute top-1/2 left-[20%] sm:left-1/4 w-[60%] sm:w-1/2 h-px bg-primary/50"
             initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
           />
           {/* Left drop */}
           <motion.div 
-            className="absolute top-1/2 left-1/4 w-px h-1/2 bg-primary/50"
+            className="absolute top-1/2 left-[20%] sm:left-1/4 w-px h-1/2 bg-primary/50"
             initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
             style={{ transformOrigin: 'top' }}
             transition={{ duration: 0.2, delay: 0.4 }}
           />
           {/* Right drop */}
           <motion.div 
-            className="absolute top-1/2 right-1/4 w-px h-1/2 bg-primary/50"
+            className="absolute top-1/2 right-[20%] sm:right-1/4 w-px h-1/2 bg-primary/50"
             initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
             style={{ transformOrigin: 'top' }}
             transition={{ duration: 0.2, delay: 0.4 }}
@@ -286,13 +286,13 @@ const WorkflowVisualization = () => {
         </div>
 
         {/* Row 2: Managers */}
-        <div className="flex justify-around w-full px-2 relative z-10">
+        <div className="flex justify-around w-[80%] sm:w-full px-2 relative z-10">
           <WorkflowNode label="R-MGR" role="Research Lead" tier="manager" />
           <WorkflowNode label="C-MGR" role="Content Lead" tier="manager" />
         </div>
 
         {/* Connector: Managers to Workers */}
-        <div className="w-full flex relative h-5">
+        <div className="w-full flex relative h-3 sm:h-5">
           {/* Left team connectors */}
           <div className="flex-1 relative">
             {/* Vertical from R-MGR */}
@@ -304,14 +304,14 @@ const WorkflowVisualization = () => {
             />
             {/* Horizontal bar for left workers */}
             <motion.div 
-              className="absolute top-1/2 left-[15%] w-[70%] h-px bg-primary/40"
+              className="absolute top-1/2 left-[10%] sm:left-[15%] w-[80%] sm:w-[70%] h-px bg-primary/40"
               initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
               transition={{ duration: 0.3, delay: 0.55 }}
             />
             {/* Drops to 3 workers */}
-            <motion.div className="absolute top-1/2 left-[15%] w-px h-1/2 bg-primary/40" />
-            <motion.div className="absolute top-1/2 left-1/2 w-px h-1/2 bg-primary/40" />
-            <motion.div className="absolute top-1/2 left-[85%] w-px h-1/2 bg-primary/40" />
+            <div className="absolute top-1/2 left-[10%] sm:left-[15%] w-px h-1/2 bg-primary/40" />
+            <div className="absolute top-1/2 left-1/2 w-px h-1/2 bg-primary/40" />
+            <div className="absolute top-1/2 left-[90%] sm:left-[85%] w-px h-1/2 bg-primary/40" />
           </div>
           
           {/* Right team connectors */}
@@ -325,27 +325,27 @@ const WorkflowVisualization = () => {
             />
             {/* Horizontal bar for right workers */}
             <motion.div 
-              className="absolute top-1/2 left-[15%] w-[70%] h-px bg-primary/40"
+              className="absolute top-1/2 left-[10%] sm:left-[15%] w-[80%] sm:w-[70%] h-px bg-primary/40"
               initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
               transition={{ duration: 0.3, delay: 0.55 }}
             />
             {/* Drops to 3 workers */}
-            <motion.div className="absolute top-1/2 left-[15%] w-px h-1/2 bg-primary/40" />
-            <motion.div className="absolute top-1/2 left-1/2 w-px h-1/2 bg-primary/40" />
-            <motion.div className="absolute top-1/2 left-[85%] w-px h-1/2 bg-primary/40" />
+            <div className="absolute top-1/2 left-[10%] sm:left-[15%] w-px h-1/2 bg-primary/40" />
+            <div className="absolute top-1/2 left-1/2 w-px h-1/2 bg-primary/40" />
+            <div className="absolute top-1/2 left-[90%] sm:left-[85%] w-px h-1/2 bg-primary/40" />
           </div>
         </div>
 
         {/* Row 3: Workers - split into two teams */}
         <div className="flex w-full relative z-10">
           {/* Left team: Research workers */}
-          <div className="flex-1 flex justify-around px-1">
+          <div className="flex-1 flex justify-around px-0.5 sm:px-1">
             <WorkflowNode label="SCRP" role="Scraper" tier="worker" />
             <WorkflowNode label="ANLY" role="Analyst" tier="worker" />
             <WorkflowNode label="FACT" role="Fact Check" tier="worker" />
           </div>
           {/* Right team: Content workers */}
-          <div className="flex-1 flex justify-around px-1">
+          <div className="flex-1 flex justify-around px-0.5 sm:px-1">
             <WorkflowNode label="WRIT" role="Writer" tier="worker" />
             <WorkflowNode label="EDIT" role="Editor" tier="worker" />
             <WorkflowNode label="PUB" role="Publisher" tier="worker" />
@@ -376,22 +376,21 @@ const WorkflowNode = ({
   }[tier];
   
   const sizeClass = {
-    leader: "w-8 h-8 sm:w-10 sm:h-10",
-    manager: "w-6 h-6 sm:w-8 sm:h-8",
-    worker: "w-5 h-5 sm:w-6 sm:h-6"
+    leader: "w-7 h-7 sm:w-10 sm:h-10",
+    manager: "w-5 h-5 sm:w-8 sm:h-8",
+    worker: "w-4 h-4 sm:w-6 sm:h-6"
   }[tier];
 
   return (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.4 }}
+    <div
       className="relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
-        animate={{ scale: isHovered ? 1.1 : 1 }}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: isHovered ? 1.1 : 1, opacity: 1 }}
+        transition={{ duration: 0.4 }}
         className={`relative ${sizeClass} flex items-center justify-center cursor-pointer`}
         style={{
           backgroundColor: isHovered ? `${tierColor}20` : 'hsl(var(--card))',
@@ -412,9 +411,9 @@ const WorkflowNode = ({
         />
         
         {icon ? (
-          <span className="text-[10px] sm:text-xs" style={{ color: tierColor }}>{icon}</span>
+          <span className="text-[8px] sm:text-xs" style={{ color: tierColor }}>{icon}</span>
         ) : (
-          <span className="text-[5px] sm:text-[7px] font-mono font-medium" style={{ color: tierColor }}>
+          <span className="text-[4px] sm:text-[7px] font-mono font-medium" style={{ color: tierColor }}>
             {label}
           </span>
         )}
@@ -422,24 +421,24 @@ const WorkflowNode = ({
       
       {/* Label below */}
       <span 
-        className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[5px] sm:text-[6px] font-mono uppercase tracking-wider whitespace-nowrap"
+        className="absolute -bottom-2.5 sm:-bottom-3 left-1/2 -translate-x-1/2 text-[4px] sm:text-[6px] font-mono uppercase tracking-wider whitespace-nowrap"
         style={{ color: `${tierColor}` }}
       >
         {label}
       </span>
       
-      {/* Tooltip on hover */}
+      {/* Tooltip on hover - hidden on mobile */}
       {isHovered && (
         <motion.div
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-card border whitespace-nowrap pointer-events-none z-10"
+          className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-card border whitespace-nowrap pointer-events-none z-10 hidden sm:block"
           style={{ borderColor: `${tierColor}60` }}
         >
           <span className="text-[8px] font-mono" style={{ color: tierColor }}>{role}</span>
         </motion.div>
       )}
-    </motion.div>
+    </div>
   );
 };
 
